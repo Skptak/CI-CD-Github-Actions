@@ -46,7 +46,7 @@ runs:
         echo "GITHUB_ACTION_PATH/rust-spell-check=$GITHUB_ACTION_PATH"
         ls $GITHUB_ACTION_PATH
         cd $GITHUB_ACTION_PATH
-        cargo build
+        cargo build --release
         target/debug/spell-checker --help
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
@@ -65,7 +65,7 @@ runs:
       run: |
         # Run Spell Checker
         echo "::group::Run Spell Checker"
-        PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
+        PATH=$PATH:$GITHUB_ACTION_PATH/target/release
         find . -iname "*.[ch]"| xargs spell-checker -c -w ${{ inputs.lexicon}}
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
