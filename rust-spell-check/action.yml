@@ -37,12 +37,17 @@ runs:
 
     - name: Compile Spell checker
       id: compile-spell-chcker
-      working-directory: $PATH/$GITHUB_ACTION_PATH/rust-spell-check
+      working-directory: .
       run: | 
         # Compile Spell Checker
         echo "::group::Compile Spell Checker"
         PATH=$PATH:/home/runner/.cargo/bin
         cargo --version
+        echo "GITHUB_ACTION_PATH/rust-spell-check= $GITHUB_ACTION_PATH/rust-spell-check"
+        ls $GITHUB_ACTION_PATH/rust-spell-check
+        cd $GITHUB_ACTION_PATH/rust-spell-check
+        ls $PATH
+        cargo build
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
           echo -e "\e[0;32mBuilt the spell checker\e[0m"
