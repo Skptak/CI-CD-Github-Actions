@@ -14,7 +14,7 @@ runs:
         echo "::group::Install aspell"
         sudo apt-get install aspell libaspell-dev util-linux
         if [ "$?" = "0" ]; then
-        echo "::endgroup::""
+        echo "::endgroup::"
           echo -e "\033[32;3mInstalled Aspell Succesfully\033[0m"
         else
           echo -e "\033[32;31mAspell Installation Failed...\033[0m"
