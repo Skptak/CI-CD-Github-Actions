@@ -69,15 +69,17 @@ runs:
       run: |
         # Run Spell Checker
         echo "::group::Run Spell Checker"
-        echo $PATH
-        echo $GITHUB_ACTION_PATH
+        echo "PATH=$PATH"
+        echo -e "GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH\npwd:"
         pwd
+        echo -e "ls /home/runner/.cargo/bin:"
         ls /home/runner/.cargo/bin
+        PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
+        echo "PATH=$PATH"
         spell-checker --help
         echo "::endgroup::""
                 if [ "$?" = "0" ]; then
           echo -e "\e[0;32mBuilt the spell checker\e[0m"
-          PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
         else
           echo -e "\e[0;32mFailed to build the spell checker\e[0m"
           # If there is an error, set this flag high again so the exit 1 fails the run
