@@ -6,7 +6,7 @@ fn main() {
     println!("cargo:rerun-if-changed=wrapper.h");
 
     let bindings = bindgen::Builder::default()
-        .header("wrapper.h")
+        .header("wrapper.h").clang_arg("-I/opt/homebrew/Cellar/aspell/0.60.8/include/")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .generate()
         .expect("Unable to generate bindings");

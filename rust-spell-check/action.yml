@@ -1,10 +1,15 @@
-name: 'spellings'
-description: 'CI spellings check'
+name: 'rust-spell-check'
+description: 'Rust CI spellings check'
 inputs:
   path:
     description: 'Path to repository folder to check spellings in.'
     required: false
     default: ./
+  lexicon:
+    description: 'Path to lexicon file to check spellings with'
+    required: false
+    default: lexicon.txt
+
 runs:
   using: "composite"
   steps:
@@ -21,7 +26,6 @@ runs:
           echo -e "\033[32;31mAspell Installation Failed...\033[0m"
           exit 1
         fi
-        echo "::group::Install Rust Toolchain"
       shell: bash
     
     - name: Install rust toolchain
@@ -33,28 +37,15 @@ runs:
 
     - name: Compile Spell checker
       id: compile-spell-chcker
-      working-directory: rust-spell-check
+      working-directory: $PATH/$GITHUB_ACTION_PATH/rust-spell-check
       run: | 
         # Compile Spell Checker
-        echo "::endgroup::"
         echo "::group::Compile Spell Checker"
-        set +e
-        cargo --version
         PATH=$PATH:/home/runner/.cargo/bin
-        pwd
-        echo "PATH=$PATH"
-        cargo build
+        cargo --version
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
           echo -e "\e[0;32mBuilt the spell checker\e[0m"
-          #readlink -f target/debug/spell-checker
-          #spellCheckerPath=`pwd`/target/debug
-          #echo "spellCheckerPath=$spellCheckerPath"
-          #PATH=$PATH:$spellCheckerPath
-          #echo "PATH=$PATH"
-          #PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
-          #echo "PATH=$PATH"
-          echo "GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH"
         else
           echo -e "\e[0;32mFailed to build the spell checker\e[0m"
           # If there is an error, set this flag high again so the exit 1 fails the run
@@ -69,12 +60,11 @@ runs:
       run: |
         # Run Spell Checker
         echo "::group::Run Spell Checker"
+        PATH=$PATH:$GITHUB_ACTION_PATH/rust-spell-check/target/debug
         echo "PATH=$PATH"
-        echo -e "GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH"
-        PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
-        echo "PATH=$PATH"
-        spell-checker --help
-        echo "::endgroup::""
+        cd ${{ inputs.path }}
+        find "*.[ch]" | xargs spell-checker -c -w ${{ inputs.lexicon}}
+        echo "::endgroup::"
         if [ "$?" = "0" ]; then
           echo -e "\e[0;32mRan the spell checker\e[0m"
         else
