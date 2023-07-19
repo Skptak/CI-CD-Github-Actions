@@ -20,6 +20,7 @@ runs:
           echo -e "\033[32;31mAspell Installation Failed...\033[0m"
           exit 1
         fi
+        echo "::group::Install Rust Toolchain"
       shell: bash
     
     - name: Install rust toolchain
@@ -29,17 +30,14 @@ runs:
           override: true
           components: rustfmt, clippy
 
-    - name: Run cargo check
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-
     - name: Compile Spell checker
       id: compile-spell-chcker
       working-directory: rust-spell-checker
       run: | 
         # Compile Spell Checker
+        echo "::endgroup::"
         echo "::group::Compile Spell Checker"
+        PATH=$PATH:/home/runner/.cargo/bin
         pwd
         echo "PATH=$PATH"
         cargo build
