@@ -47,6 +47,7 @@ runs:
         ls $GITHUB_ACTION_PATH
         cd $GITHUB_ACTION_PATH
         cargo build
+        target/debug/spell-checker --help
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
           echo -e "\e[0;32mBuilt the spell checker\e[0m"
@@ -65,8 +66,6 @@ runs:
         # Run Spell Checker
         echo "::group::Run Spell Checker"
         PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
-        echo "PATH=$PATH"
-        spell-checker --help
         find . -iname "*.[ch]"| xargs spell-checker -c -w ${{ inputs.lexicon}}
         echo "::endgroup::"
         if [ "$?" = "0" ]; then

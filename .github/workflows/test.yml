@@ -96,7 +96,7 @@ jobs:
         uses: ./rust-spell-check
         with:
           path: coreMQTT
-          lexicon: coreMQTT/lexicon.txt
+          lexicon: lexicon.txt
   test-coverage-cop:
     runs-on: ubuntu-latest
     steps:
