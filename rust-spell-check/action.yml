@@ -11,6 +11,7 @@ runs:
     - name: Install aspell
       run: |
         # Install aspell
+        # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         echo "::group::Install aspell"
         sudo apt-get install aspell libaspell-dev util-linux
         if [ "$?" = "0" ]; then
@@ -32,11 +33,13 @@ runs:
 
     - name: Compile Spell checker
       id: compile-spell-chcker
-      working-directory: rust-spell-checker
+      working-directory: rust-spell-check
       run: | 
         # Compile Spell Checker
         echo "::endgroup::"
         echo "::group::Compile Spell Checker"
+        set +e
+        cargo --version
         PATH=$PATH:/home/runner/.cargo/bin
         pwd
         echo "PATH=$PATH"
