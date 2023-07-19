@@ -1,0 +1,76 @@
+name: 'spellings'
+description: 'CI spellings check'
+inputs:
+  path:
+    description: 'Path to repository folder to check spellings in.'
+    required: false
+    default: ./
+runs:
+  using: "composite"
+  steps:
+    - name: Install aspell
+      run: |
+        # Install aspell
+        echo "::group::Install aspell"
+        sudo apt-get install aspell libaspell-dev util-linux
+        if [ "$?" = "0" ]; then
+        echo "::endgroup::""
+          echo -e "\033[32;3mInstalled Aspell Succesfully\033[0m"
+        else
+          echo -e "\033[32;31mAspell Installation Failed...\033[0m"
+          exit 1
+        fi
+      shell: bash
+    
+    - name: Install rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: nightly
+          override: true
+          components: rustfmt, clippy
+
+    - name: Run cargo check
+      uses: actions-rs/cargo@v1
+      with:
+        command: check
+
+    - name: Compile Spell checker
+      id: compile-spell-chcker
+      working-directory: rust-spell-checker
+      run: | 
+        # Compile Spell Checker
+        echo "::group::Compile Spell Checker"
+        pwd
+        echo "PATH=$PATH"
+        cargo build
+        echo "::endgroup::"
+        if [ "$?" = "0" ]; then
+          echo -e "\e[0;32mBuilt the spell checker\e[0m"
+          PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
+        else
+          echo -e "\e[0;32mFailed to build the spell checker\e[0m"
+          # If there is an error, set this flag high again so the exit 1 fails the run
+          set -e
+          exit 1
+        fi
+      shell: bash
+
+    - name: Run Spell Checker
+      id: run-spell-checker
+      working-directory: ${{ inputs.path }}
+      run: |
+        # Run Spell Checker
+        echo "::group::Run Spell Checker"
+        spell-checker --help
+        echo "::endgroup::""
+                if [ "$?" = "0" ]; then
+          echo -e "\e[0;32mBuilt the spell checker\e[0m"
+          PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
+        else
+          echo -e "\e[0;32mFailed to build the spell checker\e[0m"
+          # If there is an error, set this flag high again so the exit 1 fails the run
+          set -e
+          exit 1
+        fi
+      shell: bash
+

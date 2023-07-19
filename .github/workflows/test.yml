@@ -83,6 +83,19 @@ jobs:
         uses: ./spellings
         with:
           path: coreMQTT
+  test-rust-spell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: FreeRTOS/coreMQTT
+          ref: main
+          path: coreMQTT
+      - name: Test spell check action
+        uses: ./rust-spell-check
+        with:
+          path: coreMQTT
   test-coverage-cop:
     runs-on: ubuntu-latest
     steps:
