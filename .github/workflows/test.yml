@@ -23,6 +23,28 @@ jobs:
           path: coreMQTT
           exclude-files: lexicon.txt
           exclude-dirs: build,docs
+      
+      - name: Test formatting check action with incorrect path
+        id: formatting-check-with-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: coreMQTT/fakePathThatDoesNotExist
+          exclude-files: lexicon.txt
+          exclude-dirs: build,docs
+        
+
+      - name: Check Last Step Failed
+        if: success() || failure() && steps.formatting-check-with-error.outcome == 'failure'
+        run: |
+          # Check Last Step Failed
+          if [ "${{ steps.formatting-check-with-error.outcome}}" = "failure" ]; then
+            echo -e "\033[32;3mCheck Last Step had outcome '${{ steps.formatting-check-with-error.outcome}}' as intended\033[0m"
+          else
+            echo -e "\033[32;31mCheck Last Step had unexpected '${{ steps.formatting-check-with-error.outcome}}' exit condition\033[0m"
+            exit 1
+          fi
+
   test-complexity-check:
     runs-on: ubuntu-latest
     steps:
