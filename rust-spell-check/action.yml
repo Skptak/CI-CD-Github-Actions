@@ -43,10 +43,9 @@ runs:
         echo "::group::Compile Spell Checker"
         PATH=$PATH:/home/runner/.cargo/bin
         cargo --version
-        echo "GITHUB_ACTION_PATH/rust-spell-check= $GITHUB_ACTION_PATH/rust-spell-check"
-        ls $GITHUB_ACTION_PATH/rust-spell-check
-        cd $GITHUB_ACTION_PATH/rust-spell-check
-        ls $PATH
+        echo "GITHUB_ACTION_PATH/rust-spell-check=$GITHUB_ACTION_PATH"
+        ls $GITHUB_ACTION_PATH
+        cd $GITHUB_ACTION_PATH
         cargo build
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
@@ -65,9 +64,9 @@ runs:
       run: |
         # Run Spell Checker
         echo "::group::Run Spell Checker"
-        PATH=$PATH:$GITHUB_ACTION_PATH/rust-spell-check/target/debug
+        PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
         echo "PATH=$PATH"
-        cd ${{ inputs.path }}
+        spell-checker --help
         find "*.[ch]" | xargs spell-checker -c -w ${{ inputs.lexicon}}
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
