@@ -67,7 +67,7 @@ runs:
         PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
         echo "PATH=$PATH"
         spell-checker --help
-        find "*.[ch]" | xargs spell-checker -c -w ${{ inputs.lexicon}}
+        find . -iname "*.[ch]"| xargs spell-checker -c -w ${{ inputs.lexicon}}
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
           echo -e "\e[0;32mRan the spell checker\e[0m"
