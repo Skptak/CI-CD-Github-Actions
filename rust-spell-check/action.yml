@@ -47,7 +47,14 @@ runs:
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
           echo -e "\e[0;32mBuilt the spell checker\e[0m"
+          readlink -f target/debug/spell-checker
+          spellCheckerPath=`pwd`/target/debug
+          echo "spellCheckerPath=$spellCheckerPath"
+          PATH=$PATH:$spellCheckerPath
+          echo "PATH=$PATH"
           PATH=$PATH:$GITHUB_ACTION_PATH/target/debug
+          echo "PATH=$PATH"
+          echo "GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH"
         else
           echo -e "\e[0;32mFailed to build the spell checker\e[0m"
           # If there is an error, set this flag high again so the exit 1 fails the run
@@ -62,6 +69,10 @@ runs:
       run: |
         # Run Spell Checker
         echo "::group::Run Spell Checker"
+        echo $PATH
+        echo $GITHUB_ACTION_PATH
+        pwd
+        ls /home/runner/.cargo/bin
         spell-checker --help
         echo "::endgroup::""
                 if [ "$?" = "0" ]; then
