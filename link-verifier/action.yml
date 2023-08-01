@@ -78,7 +78,7 @@ runs:
           args+=" --allowlist-file ${allowlist_file}"
         fi
 
-        echo "${{ env.bashInfo }}Running verify-links.py ${args} --user-agent \"${{ inputs.user-agent }}\" ${{env.bashEnd}}"
+        echo -e "${{ env.bashInfo }} Running verify-links.py ${args} --user-agent \"${{ inputs.user-agent }}\" ${{ env.bashEnd }}"
         set +e
         python3 ${GITHUB_ACTION_PATH}/verify-links.py ${args} --user-agent "${{ inputs.user-agent }}";
         exitStatus=$?
