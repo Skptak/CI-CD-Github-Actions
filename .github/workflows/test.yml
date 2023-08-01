@@ -80,6 +80,30 @@ jobs:
                 exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace",
                 exclude-files: "badFile.c"
               },
+              {
+                test-type: Functional,
+                test-status: success,
+                description: "No Errors Due to Exclude-Files",
+                path: formatting,
+                exclude-dirs: ",,,",
+                exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
+              },
+              {
+                test-type: Functional,
+                test-status: success,
+                description: "No Errors With mix of Exclude Files and Exclude Dirs",
+                path: formatting,
+                exclude-dirs: "goodFiles",
+                exclude-files: "cgc_error.h,main-blinky.c,test.c"
+              },
+              {
+                test-type: Functional,
+                test-status: success,
+                description: "No Errors With mix of Exclude Files and Exclude Dirs",
+                path: formatting,
+                exclude-dirs: "filesWithFormattingErrors",
+                exclude-files: "test.c,cgc_error.h,main-blinky.c"
+              },
             ]
     steps:
       - uses: actions/checkout@v3
