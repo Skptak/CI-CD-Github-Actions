@@ -16,16 +16,46 @@ inputs:
 runs:
   using: "composite"
   steps: 
-      - name: Install dependencies
-        run: pip install -r $GITHUB_ACTION_PATH/requirements.txt
+      - env: 
+          bashInfo:   \033[33;1mINFO -
+          bashFail:   \033[31;1mFAILED -
+          bashEnd:    \033[0m
+          stepName: Install Manifest Verification Dependencies
+        name: ${{ env.stepName }}
         shell: bash
-      - name: Run verifier script
+        run: | 
+          # ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
+          set +e
+          pip install -r $GITHUB_ACTION_PATH/requirements.txt
+          exitStatus=$?
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+        
+      - env: 
+          stepName: Run Manifest Verification Script
+        name: ${{ env.stepName }}
         working-directory: ${{ inputs.path }}
-        run: |
+        shell: bash
+        run: | 
+          # ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
           if [[ "${{ inputs.fail-on-incorrect-version }}" == "true" ]]; then
-            echo 'Value of flag is ${{ inputs.fail-on-incorrect-version }}' 
+            echo "${{env.bashInfo}} Value of flag is ${{ inputs.fail-on-incorrect-version }} ${{ env.bashEnd }}"
             python3 $GITHUB_ACTION_PATH/verify_manifest.py --ignore-submodule-path=${{ inputs.exclude-submodules }} --fail-on-incorrect-version
           else
             python3 $GITHUB_ACTION_PATH/verify_manifest.py --ignore-submodule-path=${{ inputs.exclude-submodules }}
           fi
-        shell: bash
+          exitStatus=$?
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
