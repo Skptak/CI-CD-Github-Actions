@@ -1,4 +1,4 @@
-name: Test actions
+name:  Repository Pull Request Checks
 
 on:
   pull_request:
