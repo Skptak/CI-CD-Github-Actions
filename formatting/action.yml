@@ -62,6 +62,7 @@ runs:
         shell: bash
         run: |
           # Uncrustify on C files while ignoring symlinks.
+          echo -e "${{ env.bashWarn }} Using uncrustify version :$(uncrustify --version) ${{ env.bashEnd }}"
           echo "::group::Uncrustify Check"
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
@@ -70,13 +71,12 @@ runs:
 
           # Get all files that end in .c or .h. Exclude any files or directories that we were asked to.
           # Then limit the search to files that have the amazon copyright on them.
-          set -x
           files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lrniE "copyright (.*) [0-9]{4} amazon.com" )
 
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
             # Print them out for future debugging
-            echo -e "${{ env.bashWarn }}Parsing File:$file ${{ env.bashEnd }}"
+            echo -e "${{ env.bashWarn }} Parsing File:$file ${{ env.bashEnd }}"
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
@@ -84,20 +84,20 @@ runs:
 
             # If the previous command failed then print out an error message as well as the output
             if [ "$?" != "0" ]; then
-              echo -e "${{ env.bashFail }}Error parsing $file:\n${{ env.bashEnd }}"
+              echo -e "${{ env.bashFail }} Error parsing $file:\n${{ env.bashEnd }}"
               echo -e "$fileOut"
             fi
           done
-
           echo "::endgroup::"
+
           # Run a git diff to print the differences if any exist, return an error code if there are any
           git diff --exit-code
           if [ "$?" = "0" ]; then
-            echo -e "${{ env.bashPass }}Uncrustify check passed${{ env.bashEnd }}"
+            echo -e "${{ env.bashPass }} Uncrustify check passed${{ env.bashEnd }}"
           else
             filesWithErrors=$(git diff --name-only)
-            echo -e "${{ env.bashFail }}List of files with formatting errors:$filesWithErrors${{ env.bashEnd }}"
-            echo -e "${{ env.bashFail }}Formatting check (using Uncrustify) failed...${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} List of files with formatting errors:$filesWithErrors ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} Formatting check (using Uncrustify) failed... ${{ env.bashEnd }}"
             # If there is an error, set this flag high again so the exit 1 fails the run instantly
             set -e
             exit 1
@@ -117,8 +117,8 @@ runs:
           set +e
           grep --exclude={README.md,${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},.git} -rnIe "[[:blank:]]$" .
           if [ "$?" = "0" ]; then
-            set -e
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            set -e
             exit 1
           else
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -136,8 +136,8 @@ runs:
           set +e
           grep --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},.git} -rnl $'\r'
           if [ "$?" = "0" ]; then
-            set -e
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            set -e
             exit 1
           else
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
