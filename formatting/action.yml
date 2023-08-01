@@ -44,7 +44,7 @@ runs:
           exitStatus=0
           # Check exclude dirs for possible input issues
           if [[ "${{ inputs.exclude-dirs }}" = *" "* ]]; then
-            echo -e "${{ env.bashFAIL }} YOU HAVE WHITESPACE IN YOUR EXCLUDE-DIRS. ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} YOU HAVE WHITESPACE IN YOUR EXCLUDE-DIRS. ${{ env.bashEnd }}"
             exitStatus=1
           fi
 
@@ -97,7 +97,8 @@ runs:
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
             filesWithErrors=$(git diff --name-only)
-            echo -e "${{ env.bashFail }} List of files with formatting errors:$filesWithErrors ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} List of files with formatting errors: ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} "$filesWithErrors" ${{ env.bashEnd }} "
             echo -e "${{ env.bashFail }} ${{env.stepName }} ${{ env.bashEnd }}"
             # If there is an error, set this flag high again so the exit 1 fails the run instantly
             set -e
@@ -118,6 +119,7 @@ runs:
           # ${{ env.stepName }}
           echo -e "${{ env.bashWarn }} Using clang-format version :$(clang-format --version) ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
+          clang-format --version
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
           # This would mean the first time a file fails the check that we exit without formatting all files.
@@ -130,11 +132,18 @@ runs:
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
             # Print them out for future debugging
-            echo -e "${{ env.bashWarn }} Parsing File:"$file" ${{ env.bashEnd }}"
+            echo -e "${{ env.bashWarn }} Parsing File: "$file" ${{ env.bashEnd }}"
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
             set -x
+            readlink -f "$GITHUB_ACTION_PATH"/clang-format
+            readlink -f "$GITHUB_ACTION_PATH"/clang-format.txt
+            readlink -f "$GITHUB_ACTION_PATH"/.clang-format
+            clang-format -style=file:"$GITHUB_ACTION_PATH"/clang-format $file
+            clang-format -style=file:"$GITHUB_ACTION_PATH"/.clang-format $file
+            clang-format -style=file:"$GITHUB_ACTION_PATH"/clang-format.txt $file
+            clang-format -style=file $file
             fileOut=$(clang-format -i -style=file:"$GITHUB_ACTION_PATH"/clang-format $file 2>&1)
 
             # If the previous command failed then print out an error message as well as the output
@@ -151,7 +160,8 @@ runs:
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
             filesWithErrors=$(git diff --name-only)
-            echo -e "${{ env.bashFail }} List of files with formatting errors:$filesWithErrors ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} List of files with formatting errors: ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} "$filesWithErrors" ${{ env.bashEnd }} "
             echo -e "${{ env.bashFail }} ${{env.stepName }} ${{ env.bashEnd }}"
             # If there is an error, set this flag high again so the exit 1 fails the run instantly
             set -e
