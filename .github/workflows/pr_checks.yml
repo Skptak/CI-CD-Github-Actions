@@ -210,10 +210,18 @@ jobs:
           exclude-dirs: complexity,formatting
           include-file-types: .c,.html
 
+      - name: "Clone: ${{ matrix.inputs.repository }}"
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ matrix.inputs.org }}/${{ matrix.inputs.repository }}
+          ref: main
+          path: ${{ matrix.inputs.repository }}_Recursive
+          submodules: recursive
+
       - name: "Manifest Verifier: ${{ matrix.inputs.repository }}"
         if: success() || failure()  
         uses: ./manifest-verifier
         with:
-          path: ${{ matrix.inputs.repository }}
+          path: ${{ matrix.inputs.repository }}_Recursive
           exclude-submodules: FreeRTOS-Plus/Test/CMock,FreeRTOS/Test/CMock/CMock,FreeRTOS/Test/litani
           fail-on-incorrect-version: true
