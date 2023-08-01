@@ -21,6 +21,7 @@ runs:
           : # Install Uncrustify
           echo "::group::Install Uncrustify"
           sudo apt-get install uncrustify
+          sudo apt-get install clang-format
           echo "::endgroup::"
         shell: bash
 
@@ -35,7 +36,7 @@ runs:
           bashFail:   \033[31;1mFAILED -
           bashEnd:    \033[0m
         name: ${{ env.stepName }}
-        id: compile-executable-monitor-test-files
+        id: validate-inputs
         shell: bash
         run: |
           # ${{ env.stepName }}
@@ -61,9 +62,9 @@ runs:
         working-directory: ${{ inputs.path }}
         shell: bash
         run: |
-          # Uncrustify on C files while ignoring symlinks.
+          # ${{ env.stepName }}
           echo -e "${{ env.bashWarn }} Using uncrustify version :$(uncrustify --version) ${{ env.bashEnd }}"
-          echo "::group::Uncrustify Check"
+          echo "::group::${{ env.stepName }}"
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
           # This would mean the first time a file fails the check that we exit without formatting all files.
@@ -76,7 +77,7 @@ runs:
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
             # Print them out for future debugging
-            echo -e "${{ env.bashWarn }} Parsing File:$file ${{ env.bashEnd }}"
+            echo -e "${{ env.bashWarn }} Parsing File: "$file" ${{ env.bashEnd }}"
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
@@ -84,7 +85,7 @@ runs:
 
             # If the previous command failed then print out an error message as well as the output
             if [ "$?" != "0" ]; then
-              echo -e "${{ env.bashFail }} Error parsing $file:\n${{ env.bashEnd }}"
+              echo -e "${{ env.bashFail }} Error parsing "$file": ${{ env.bashEnd }}\n"
               echo -e "$fileOut"
             fi
           done
@@ -93,11 +94,64 @@ runs:
           # Run a git diff to print the differences if any exist, return an error code if there are any
           git diff --exit-code
           if [ "$?" = "0" ]; then
-            echo -e "${{ env.bashPass }} Uncrustify check passed${{ env.bashEnd }}"
+            echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
             filesWithErrors=$(git diff --name-only)
             echo -e "${{ env.bashFail }} List of files with formatting errors:$filesWithErrors ${{ env.bashEnd }}"
-            echo -e "${{ env.bashFail }} Formatting check (using Uncrustify) failed... ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} ${{env.stepName }} ${{ env.bashEnd }}"
+            # If there is an error, set this flag high again so the exit 1 fails the run instantly
+            set -e
+            exit 1
+          fi
+
+      - env:
+          stepName: Run Clang Format
+        name: ${{ env.stepName }}
+        shell: bash
+        # Use this so that even if we fail formatting these checks run
+        # Solves the issue of "Make commit to fix formatting, to then learn
+        # You need to fix whitespace
+        if: success() || failure()
+        continue-on-error: true
+        working-directory: ${{ inputs.path }}
+        run: |
+          # ${{ env.stepName }}
+          echo -e "${{ env.bashWarn }} Using clang-format version :$(clang-format --version) ${{ env.bashEnd }}"
+          echo "::group::${{ env.stepName }}"
+
+          # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
+          # This would mean the first time a file fails the check that we exit without formatting all files.
+          set +e
+
+          # Get all files that end in .c or .h. Exclude any files or directories that we were asked to.
+          # Then limit the search to files that have the amazon copyright on them.
+          files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lrniE "copyright (.*) [0-9]{4} amazon.com" )
+
+          # Loop over the files that matched the above conditions
+          for file in ${files[@]}; do
+            # Print them out for future debugging
+            echo -e "${{ env.bashWarn }} Parsing File:"$file" ${{ env.bashEnd }}"
+
+            # Pipe the output of the command to a variable
+            # This way we can print the command only if it fails
+            fileOut=$(clang-format -i -style=file:$GITHUB_ACTION_PATH/clang-format $file 2>&1)
+
+            # If the previous command failed then print out an error message as well as the output
+            if [ "$?" != "0" ]; then
+              echo -e "${{ env.bashFail }} Error parsing "$file" ${{ env.bashEnd }}"
+              echo -e "$fileOut"
+            fi
+          done
+          echo "::endgroup::"
+
+          # Run a git diff to print the differences if any exist, return an error code if there are any
+          git diff --exit-code
+          if [ "$?" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
+          else
+            filesWithErrors=$(git diff --name-only)
+            echo -e "${{ env.bashFail }} List of files with formatting errors:$filesWithErrors ${{ env.bashEnd }}"
+            echo -e "${{ env.bashFail }} ${{env.stepName }} ${{ env.bashEnd }}"
             # If there is an error, set this flag high again so the exit 1 fails the run instantly
             set -e
             exit 1
