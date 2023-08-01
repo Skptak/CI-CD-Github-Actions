@@ -1,1 +1,2 @@
 formatting/filesWithCRLFEndings/* eol=crlf
+formatting/goodFiles/source/badFile.c eol=crlf
