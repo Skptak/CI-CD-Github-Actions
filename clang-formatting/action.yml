@@ -16,12 +16,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Install Uncrustify
+      - env:
+          stepName: Install Clang Format
+        name: ${{ env.stepName }}
         shell: bash
         run: |
-          : # Install Uncrustify
-          echo "::group::Install Uncrustify"
-          sudo apt-get install uncrustify
+          # ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
+          sudo apt-get install clang-format
           echo "::endgroup::"
 
       - env:
@@ -56,15 +58,19 @@ runs:
           exit $exitStatus
 
       - env:
-          stepName: Run Uncrustify
+          stepName: Run Clang Format
         name: ${{ env.stepName }}
-        if: ${{ steps.validate-inputs.outcome}} = "success" && os.version == "ubuntu-20.04"
-        working-directory: ${{ inputs.path }}
         shell: bash
+        # Use this so that even if we fail formatting these checks run
+        # Solves the issue of "Make commit to fix formatting, to then learn
+        # You need to fix whitespace
+        if: ${{ steps.validate-inputs.outcome}} = "success"
+        working-directory: ${{ inputs.path }}
         run: |
           # ${{ env.stepName }}
-          echo -e "${{ env.bashInfo }} Using Uncrustify version "$(uncrustify --version)" ${{ env.bashEnd }}"
+          echo -e "${{ env.bashInfo }} Using clang-format version :$(clang-format --version) ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
+          clang-format --version
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
           # This would mean the first time a file fails the check that we exit without formatting all files.
@@ -81,11 +87,19 @@ runs:
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
-            fileOut=$(uncrustify --no-backup --replace --if-changed -c $GITHUB_ACTION_PATH/uncrustify.cfg -l C $file 2>&1)
+            set -x
+            readlink -f "$GITHUB_ACTION_PATH"/clang-format
+            readlink -f "$GITHUB_ACTION_PATH"/clang-format.txt
+            readlink -f "$GITHUB_ACTION_PATH"/.clang-format
+            clang-format -style=file:"$GITHUB_ACTION_PATH"/clang-format $file
+            clang-format -style=file:"$GITHUB_ACTION_PATH"/.clang-format $file
+            clang-format -style=file:"$GITHUB_ACTION_PATH"/clang-format.txt $file
+            clang-format -style=file $file
+            fileOut=$(clang-format -i -style=file:"$GITHUB_ACTION_PATH"/clang-format $file 2>&1)
 
             # If the previous command failed then print out an error message as well as the output
             if [ "$?" != "0" ]; then
-              echo -e "${{ env.bashFail }} Error parsing "$file": ${{ env.bashEnd }}\n"
+              echo -e "${{ env.bashFail }} Error parsing "$file" ${{ env.bashEnd }}"
               echo -e "$fileOut"
             fi
           done
