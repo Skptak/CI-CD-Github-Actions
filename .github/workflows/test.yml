@@ -248,7 +248,7 @@ jobs:
         id: exclude-dirs-with-errors
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
           exclude-files: "badFile.c"
 
@@ -258,7 +258,7 @@ jobs:
         id: exclude-files-with-errors
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: ",,,"
           exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
 
@@ -268,7 +268,7 @@ jobs:
         id: exclude-single-dir-multiple-files
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "goodFiles"
           exclude-files: "cgc_error.h,main-blinky.c,test.c"
 
@@ -278,7 +278,7 @@ jobs:
         id: exclude-two-files-two-dirs
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
           exclude-files: "test.c,cgc_error.h,main-blinky.c,badFile.c"
 
@@ -293,7 +293,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
 
       - env:
           stepName: "Functional | Failure | CRLF and Formatting Error"
@@ -302,7 +302,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithTrailingWhitespace"
 
       - env:
@@ -312,7 +312,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithFormattingErrors"
 
       - env:
@@ -322,7 +322,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
           exclude-files: "badFile.c"
 
@@ -333,7 +333,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithCRLFEndings"
 
       - env:
@@ -343,7 +343,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithTrailingWhitespace,filesWithCRLFEndings"
 
       - env:
@@ -353,7 +353,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithFormattingErrrors,filesWithCRLFEndings"
 
       - env:
@@ -363,7 +363,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-dirs: "filesWithFormattingErrrors,    filesWithCRLFEndings"
 
       - env:
@@ -373,7 +373,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-files: "filesWithFormattingErrrors,    filesWithCRLFEndings"
 
       - env:
@@ -383,7 +383,7 @@ jobs:
         continue-on-error: true
         uses: ./clang-formatting
         with:
-          path: formatting
+          path: clang-formatting
           exclude-files: "filesWithFormattingErrrors,    filesWithCRLFEndings"
           exclude-dirs: "filesWithFormattingErrrors,
                           filesWithCRLFEndings"

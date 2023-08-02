@@ -87,8 +87,7 @@ runs:
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
-            clang-format -i $file
-
+            fileOut=$(clang-format -i --verbose --style=file $file)
             # If the previous command failed then print out an error message as well as the output
             if [ "$?" != "0" ]; then
               echo -e "${{ env.bashFail }} Error parsing "$file" ${{ env.bashEnd }}"
@@ -96,7 +95,6 @@ runs:
             fi
           done
           echo "::endgroup::"
-
           # Run a git diff to print the differences if any exist, return an error code if there are any
           echo "::group::File Difference"
           git diff --exit-code
