@@ -154,7 +154,7 @@
             }                                                                  \
                                                                                \
             /* listGET_OWNER_OF_NEXT_ENTRY indexes through the list, so the    \
-             * tasks of the  same priority get an equal share of the processor                        \
+             * tasks of the  same priority get an equal share of the processor \
              * time. */                                                        \
             listGET_OWNER_OF_NEXT_ENTRY(                                       \
                 pxCurrentTCB,                                                  \
@@ -390,11 +390,12 @@ portDONT_DISCARD PRIVILEGED_DATA TCB_t * volatile pxCurrentTCB = NULL;
  * xDelayedTaskList1 and xDelayedTaskList2 could be moved to function scope but
  * doing so breaks some kernel aware debuggers and debuggers that rely on
  * removing the static qualifier. */
-PRIVILEGED_DATA static List_t pxReadyTasksLists[ configMAX_PRIORITIES ]; /**<
-                                                                            Prioritised
-                                                                            ready
-                                                                            tasks.
-                                                                          */
+PRIVILEGED_DATA static List_t
+    pxReadyTasksLists[ configMAX_PRIORITIES ];   /**<
+                                                    Prioritised
+                                                    ready
+                                                    tasks.
+                                                  */
 PRIVILEGED_DATA static List_t xDelayedTaskList1; /**< Delayed tasks. */
 PRIVILEGED_DATA static List_t xDelayedTaskList2; /**< Delayed tasks (two lists
                                                     are used - one for delays
@@ -1029,33 +1030,34 @@ static void prvInitialiseNewTask(
         pxTopOfStack = &( pxNewTCB->pxStack[ ulStackDepth - ( uint32_t ) 1 ] );
         pxTopOfStack =
             ( StackType_t * ) ( ( ( portPOINTER_SIZE_TYPE ) pxTopOfStack ) &
-                                ( ~( ( portPOINTER_SIZE_TYPE )
-                                         portBYTE_ALIGNMENT_MASK ) ) ); /*lint
-                                                                           !e923
-                                                                           !e9033
-                                                                           !e9078
-                                                                           MISRA
-                                                                           exception.
-                                                                           Avoiding
-                                                                           casts
-                                                                           between
-                                                                           pointers
-                                                                           and
-                                                                           integers
-                                                                           is
-                                                                           not
-                                                                           practical.
-                                                                           Size
-                                                                           differences
-                                                                           accounted
-                                                                           for
-                                                                           using
-                                                                           portPOINTER_SIZE_TYPE
-                                                                           type.
-                                                                           Checked
-                                                                           by
-                                                                           assert().
-                                                                         */
+                                ( ~(
+                                    ( portPOINTER_SIZE_TYPE )
+                                        portBYTE_ALIGNMENT_MASK ) ) ); /*lint
+                                                                          !e923
+                                                                          !e9033
+                                                                          !e9078
+                                                                          MISRA
+                                                                          exception.
+                                                                          Avoiding
+                                                                          casts
+                                                                          between
+                                                                          pointers
+                                                                          and
+                                                                          integers
+                                                                          is
+                                                                          not
+                                                                          practical.
+                                                                          Size
+                                                                          differences
+                                                                          accounted
+                                                                          for
+                                                                          using
+                                                                          portPOINTER_SIZE_TYPE
+                                                                          type.
+                                                                          Checked
+                                                                          by
+                                                                          assert().
+                                                                        */
 
         /* Check the alignment of the calculated top of stack is correct. */
         configASSERT(
@@ -6000,18 +6002,19 @@ static void prvAddCurrentTaskToDelayedList(
     {
         /* The current task must be in a ready list, so there is no need to
          * check, and the port reset macro can be called directly. */
-        portRESET_READY_PRIORITY( pxCurrentTCB->uxPriority,
-                                  uxTopReadyPriority ); /*lint !e931
-                                                           pxCurrentTCB cannot
-                                                           change as it is the
-                                                           calling task.
-                                                           pxCurrentTCB->uxPriority
-                                                           and
-                                                           uxTopReadyPriority
-                                                           cannot change as
-                                                           called with scheduler
-                                                           suspended or in a
-                                                           critical section. */
+        portRESET_READY_PRIORITY(
+            pxCurrentTCB->uxPriority,
+            uxTopReadyPriority ); /*lint !e931
+                                     pxCurrentTCB cannot
+                                     change as it is the
+                                     calling task.
+                                     pxCurrentTCB->uxPriority
+                                     and
+                                     uxTopReadyPriority
+                                     cannot change as
+                                     called with scheduler
+                                     suspended or in a
+                                     critical section. */
     }
     else
     {
