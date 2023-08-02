@@ -100,8 +100,9 @@ runs:
           # Run a git diff to print the differences if any exist, return an error code if there are any
           echo "::group::File Difference"
           git diff --exit-code
+          exitCode=$?
           echo "::endgroup::"
-          if [ "$?" = "0" ]; then
+          if [ "$exitCode" = "0" ]; then
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
             filesWithErrors=$(git diff --name-only)
