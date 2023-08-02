@@ -87,7 +87,7 @@ runs:
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
-            fileOut=$(clang-format -i -style=file:"$GITHUB_ACTION_PATH"/clang-format $file 2>&1)
+            clang-format -i -style=file:"$GITHUB_ACTION_PATH"/clang-format $file
 
             # If the previous command failed then print out an error message as well as the output
             if [ "$?" != "0" ]; then
