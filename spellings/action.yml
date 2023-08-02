@@ -12,18 +12,17 @@ runs:
         run: |
           sudo apt-get install spell
           sudo apt-get install util-linux
+          sudo apt-get install npm
+          npm install -g cspell
         shell: bash
       - name: Check spelling
         working-directory: ${{ inputs.path }}
         run: |
-          PATH=$PATH:$GITHUB_ACTION_PATH/tools
-          for lexfile in `find ./ -name lexicon.txt`
-          do dir=${lexfile%/lexicon.txt}
-            echo $dir
-            find-unknown-comment-words --directory $dir
-            if [ $? -ne "0" ]
-            then
-              exit 1
-            fi
-          done
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          cspell --language-id C --unique --words-only "**/*.c" "**/*.h" | sort --ignore-case >> $GITHUB_ACTION_PATH/shared-dict.txt
+          cd $GITHUB_ACTION_PATH/
+          git add shared-dict.txt
+          git commit -m "Updating shared-dict.txt"
+          git push origin main
         shell: bash

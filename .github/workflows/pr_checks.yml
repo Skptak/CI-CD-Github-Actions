@@ -11,7 +11,7 @@ env:
   bashInfo:   \033[33;1mINFO -
   bashFail:   \033[31;1mFAILED -
   bashEnd:    \033[0m
- 
+
 
 jobs:
 
@@ -20,11 +20,11 @@ jobs:
     if: ${{ github.event.pull_request }} || ${{ github.event.workflow }}
     strategy:
       fail-fast: false
-      matrix: 
+      matrix:
         inputs:
-          [ 
+          [
             {
-              repository: coreHTTP,  
+              repository: coreHTTP,
               exclude-files: lexicon.txt,
               exclude-dirs: "build,docs",
               #org: FreeRTOS,
@@ -144,7 +144,7 @@ jobs:
           path: ${{ matrix.inputs.repository }}
 
       - name: "Doxygen Zip Check: ${{ matrix.inputs.repository }}"
-        if: success() || failure()  
+        if: success() || failure()
         uses: ./doxygen
         with:
           path: ${{ matrix.inputs.repository }}
@@ -156,7 +156,7 @@ jobs:
         uses: ./spellings
         with:
           path: ${{ matrix.inputs.repository }}
-  
+
 #    test-coverage-cop:
 #    runs-on: ubuntu-latest
 #    steps:
@@ -192,9 +192,9 @@ jobs:
 #          path: ./build/coverage.info
 #          branch-coverage-min: 70
 #          line-coverage-min: 100
-  
+
       - name: "Memory Statistics Check: ${{ matrix.inputs.repository }}"
-        if: success() || failure()  
+        if: success() || failure()
         uses: ./memory_statistics
         with:
           path: memory_statistics/test
@@ -202,7 +202,7 @@ jobs:
           output: ./size_table_new.html
           check_against: ./size_table_expected.html
 
-      - name: "Link Verifier Check: ${{ matrix.inputs.repository }} "
+      - name: "Link Verifier Check: ${{ matrix.inputs.repository }}"
         uses: ./link-verifier
         if: success() || failure()
         with:
@@ -211,6 +211,7 @@ jobs:
           include-file-types: .c,.html
 
       - name: "Clone: ${{ matrix.inputs.repository }}"
+        if: success() || failure()
         uses: actions/checkout@v3
         with:
           repository: ${{ matrix.inputs.org }}/${{ matrix.inputs.repository }}
@@ -219,7 +220,7 @@ jobs:
           submodules: recursive
 
       - name: "Manifest Verifier: ${{ matrix.inputs.repository }}"
-        if: success() || failure()  
+        if: success() || failure()
         uses: ./manifest-verifier
         with:
           path: ${{ matrix.inputs.repository }}_Recursive
