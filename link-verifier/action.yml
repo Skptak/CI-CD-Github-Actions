@@ -60,7 +60,7 @@ runs:
       shell: bash
       run: |
         # ${{ env.stepName }}
-        echo "::group::${{ env.stepName }}
+        echo "::group::${{ env.stepName }}"
         args="--verbose --test-markdown"
         if [ -n "${{ inputs.exclude-dirs }}" ]; then
           dirs="${{ inputs.exclude-dirs }}"

@@ -32,7 +32,7 @@ runs:
           # to an action file so stuck with this. If this gets changed
           # Please move this
           bashPass:   \033[32;1mPASSED -
-          bashWarn:   \033[33;1mINFO -
+          bashInfo:   \033[33;1mINFO -
           bashFail:   \033[31;1mFAILED -
           bashEnd:    \033[0m
         name: ${{ env.stepName }}
@@ -63,7 +63,7 @@ runs:
         shell: bash
         run: |
           # ${{ env.stepName }}
-          echo -e "${{ env.bashWarn }} Using uncrustify version :$(uncrustify --version) ${{ env.bashEnd }}"
+          echo -e "${{ env.bashInfo }} Using Uncrustify version "$(uncrustify --version)" ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
@@ -77,7 +77,7 @@ runs:
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
             # Print them out for future debugging
-            echo -e "${{ env.bashWarn }} Parsing File: "$file" ${{ env.bashEnd }}"
+            echo -e "${{ env.bashInfo }} Parsing File: "$file" ${{ env.bashEnd }}"
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
@@ -117,7 +117,7 @@ runs:
         working-directory: ${{ inputs.path }}
         run: |
           # ${{ env.stepName }}
-          echo -e "${{ env.bashWarn }} Using clang-format version :$(clang-format --version) ${{ env.bashEnd }}"
+          echo -e "${{ env.bashInfo }} Using clang-format version :$(clang-format --version) ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
           clang-format --version
 
@@ -132,7 +132,7 @@ runs:
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
             # Print them out for future debugging
-            echo -e "${{ env.bashWarn }} Parsing File: "$file" ${{ env.bashEnd }}"
+            echo -e "${{ env.bashInfo }} Parsing File: "$file" ${{ env.bashEnd }}"
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails

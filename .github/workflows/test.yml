@@ -10,113 +10,84 @@ on:
 env:
   # The bash escape character is \033
   bashPass:   \033[32;1mPASSED -
-  bashInfo:   \033[33;1mWARN -
+  bashInfo:   \033[33;1mINFO -
   bashFail:   \033[31;1mFAILED -
   bashEnd:    \033[0m
 
 jobs:
-  test-format-check:
+  formatting-error-cases:
     runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-          # Checks for a commit
-          inputs:
-            [
-              {
-                test-type: Functional,
-                test-status: failure,
-                description: "Whitespace, CRLF, and Format Failure",
-                path: formatting
-                # Also the test that not using exclude dirs/files throws no API errors
-              },
-              {
-                test-type: Functional,
-                test-status: failure,
-                description: "CRLF and Formatting Error",
-                path: formatting,
-                exclude-dirs: "filesWithTrailingWhitespace"
-              },
-              {
-                test-type: Functional,
-                test-status: failure,
-                description: "CRLF and Whitespace Error",
-                path: formatting,
-                exclude-dirs: "filesWithFormattingErrors"
-              },
-              {
-                test-type: Functional,
-                test-status: failure,
-                description: "CRLF Error",
-                path: formatting,
-                exclude-dirs: "filesWithFormattingIssues,filesWithWTrailingWhitespace"
-              },
-              {
-                test-type: Functional,
-                test-status: failure,
-                description: "Formatting and Whitespace Errror",
-                path: formatting,
-                exclude-dirs: "filesWithCRLFEndings"
-              },
-              {
-                test-type: Functional,
-                test-status: failure,
-                description: "Formatting Error",
-                path: formatting,
-                exclude-dirs: "filesWithTrailingWhitespace,filesWithCRLFEndings"
-              },
-              {
-                test-type: Functional,
-                test-status: failure,
-                description: "Whitespace Error",
-                path: formatting,
-                exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings"
-              },
-              {
-                test-type: Functional,
-                test-status: success,
-                description: "No Errors",
-                path: formatting,
-                exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace",
-                exclude-files: "badFile.c"
-              },
-              {
-                test-type: Functional,
-                test-status: success,
-                description: "No Errors Due to Exclude-Files",
-                path: formatting,
-                exclude-dirs: ",,,",
-                exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
-              },
-              {
-                test-type: Functional,
-                test-status: success,
-                description: "No Errors With mix of Exclude Files and Exclude Dirs",
-                path: formatting,
-                exclude-dirs: "goodFiles",
-                exclude-files: "cgc_error.h,main-blinky.c,test.c"
-              },
-              {
-                test-type: Functional,
-                test-status: success,
-                description: "No Errors With mix of Exclude Files and Exclude Dirs",
-                path: formatting,
-                exclude-dirs: "filesWithFormattingErrors",
-                exclude-files: "test.c,cgc_error.h,main-blinky.c"
-              },
-            ]
     steps:
       - uses: actions/checkout@v3
       - env:
-          stepName: "${{ matrix.inputs.test-type }} | ${{ matrix.inputs.test-status }} | ${{matrix.inputs.description }}"
+          stepName: "Functional | Failure | Whitespace, CRLF, and Format Failure"
         name: ${{ env.stepName }}
-        id: format-test
+        id: all-format-errors
         continue-on-error: true
         uses: ./formatting
         with:
-          path: ${{ matrix.inputs.path }}
-          exclude-files: ${{ matrix.inputs.exclude-files }}
-          exclude-dirs: ${{ matrix.inputs.exclude-dirs }}
+          path: formatting
+
+      - env:
+          stepName: "Functional | Failure | CRLF and Formatting Error"
+        name: ${{ env.stepName }}
+        id: crlf-and-format-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithTrailingWhitespace"
+
+      - env:
+          stepName: "Functional | Failure | CRLF and Whitespace Error"
+        name: ${{ env.stepName }}
+        id: crlf-and-whitespace-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors"
+
+      - env:
+          stepName: "Functional | Failure | CRLF Error"
+        name: ${{ env.stepName }}
+        id: crlf-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
+          exclude-files: "badFile.c"
+
+      - env:
+          stepName: "Functional | Failure | Formatting and Whitespace Errror"
+        name: ${{ env.stepName }}
+        id: formatting-and-whitespace-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithCRLFEndings"
+
+      - env:
+          stepName: "Functional | Failure | Formatting Errror"
+        name: ${{ env.stepName }}
+        id: formatting-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithTrailingWhitespace,filesWithCRLFEndings"
+
+      - env:
+          stepName: "Functional | Failure | Whitespace Errror"
+        name: ${{ env.stepName }}
+        id: whitespace-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrrors,filesWithCRLFEndings"
 
       - env:
           stepName: Check Failure Test Cases
@@ -125,14 +96,95 @@ jobs:
         shell: bash
         run: |
           # Check Failure Test Cases
-          set +e
-          if [ "${{ steps.format-test.outcome}}" = "${{ matrix.inputs.test-status }}" ]; then
-              echo -e "${{ env.bashPass }} ${{ matrix.inputs.test-type }} | ${{ matrix.inputs.description}} | Had Expected ${{ matrix.inputs.test-status }} ${{ env.bashEnd }}"
+          exitStatus=0
+          if [ "${{ steps.all-format-errors.outcome}}" = "failure" ]; then
+            echo -e "${{ env.bashPass }} | Had Expected "failure" ${{ env.bashEnd }}"
           else
-            echo -e "${{ env.bashFail }} ${{ matrix.inputs.test-type }} | ${{ matrix.inputs.description}} | Had Unexpected ${{ matrix.inputs.test-status }} ${{ env.bashEnd }}"
-            set -e
-            exit 1
+            echo -e "${{ env.bashFail }} | Had Unexpected "success" ${{ env.bashEnd }}"
+            exitStatus=1
           fi
+          if [ "${{ steps.crlf-and-format-error.outcome}}" = "failure" ]; then
+            echo -e "${{ env.bashPass }} | Had Expected "failure" ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} | Had Unexpected "success" ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [ "${{ steps.crlf-and-whitespace-error.outcome}}" = "failure" ]; then
+            echo -e "${{ env.bashPass }} | Had Expected "failure" ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} | Had Unexpected "success" ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [ "${{ steps.crlf-error.outcome}}" = "failure" ]; then
+            echo -e "${{ env.bashPass }} | Had Expected "failure" ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} | Had Unexpected "success" ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [ "${{ steps.formatting-and-whitespace-error.outcome}}" = "failure" ]; then
+            echo -e "${{ env.bashPass }} | Had Expected "failure" ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} | Had Unexpected "success" ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [ "${{ steps.formatting-error.outcome}}" = "failure" ]; then
+            echo -e "${{ env.bashPass }} | Had Expected "failure" ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} | Had Unexpected "success" ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [ "${{ steps.whitespace-error.outcome}}" = "failure" ]; then
+            echo -e "${{ env.bashPass }} | Had Expected "failure" ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} | Had Unexpected "success" ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          exit $exitStatus
+
+  formatting-success-cases:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      
+      - env:
+          stepName: "Functional | Success | Exclude All Error Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-dirs-with-errors
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
+          exclude-files: "badFile.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude Files"
+          name: ${{ env.stepName }}
+        id: exclude-files-with-errors
+        uses: ./formatting
+        with:  
+          path: formatting
+          exclude-dirs: ",,,"
+          exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude File and Exclude Dirs"
+          name: ${{ env.stepName }}
+        id: exclude-single-dir-multiple-files
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "goodFiles"
+          exclude-files: "cgc_error.h,main-blinky.c,test.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude Files and Exclude Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-two-files-two-dirs
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors, filesWithTrailingWhitespace"
+          exclude-files: "test.c,cgc_error.h,main-blinky.c"
 
   test-exe-monitor-success-cases:
     strategy:
