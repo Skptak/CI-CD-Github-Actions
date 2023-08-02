@@ -2,9 +2,17 @@ name: 'spellings'
 description: 'CI spellings check'
 inputs:
   path:
-    description: 'Path to repository folder to check spellings in.'
+    description: 'Path to repository folder to run formatting check for.'
     required: false
     default: ./
+  exclude-files:
+    description: 'List of comma-separated files to exclude from trailing whitespace check. Eg file1,file2'
+    required: false
+    default: ''
+  exclude-dirs:
+    description: 'List of comma-separated directories to exclude from trailing whitespace formatting check. Eg docs,build'
+    required: false
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -27,6 +35,7 @@ runs:
           bashEnd:    \033[0m
           stepName: Check Spelling
         name: ${{ env.stepName}}
+        shell: bash
         working-directory: ${{ inputs.path }}
         run: |
           #  ${{ env.stepName }}
@@ -35,7 +44,11 @@ runs:
           pwd
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "<>"
-          cspell --language-id C --unique --words-only "**/*.c" "**/*.h" | sort --ignore-case >> $GITHUB_ACTION_PATH/shared-dict.txt
+          files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" )
+          for file in ${files[@]}; do
+            echo -e "${{ env.bashInfo }} Checking Spelling of: "$file" ${{ env.bashEnd }}"
+            cspell --language-id C --unique --words-only $file >> $GITHUB_ACTION_PATH/shared-dict.txt
+          done
           exitStatus=$?
           cd $GITHUB_ACTION_PATH/
           pwd
@@ -51,4 +64,4 @@ runs:
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 1
           fi
-        shell: bash
+

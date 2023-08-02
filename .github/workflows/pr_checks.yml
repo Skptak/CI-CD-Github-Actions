@@ -66,6 +66,13 @@ jobs:
               org: skptak,
             },
             {
+              repository: FreeRTOS,
+              exclude-files: lexicon.txt,
+              exclude-dirs: "build,docs,portable",
+              #org: FreeRTOS,
+              org: skptak,
+            },
+            {
               repository: Device-Defender-for-AWS-IoT-embedded-sdk,
               exclude-files: lexicon.txt,
               exclude-dirs: "build,docs",
