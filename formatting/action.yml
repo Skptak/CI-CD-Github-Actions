@@ -70,9 +70,13 @@ runs:
           # This would mean the first time a file fails the check that we exit without formatting all files.
           set +e
 
-          # Get all files that end in .c or .h. Exclude any files or directories that we were asked to.
+          # Get all files that end in .c or .h.
+          # Exclude any files or directories that we were asked to.
           # Then limit the search to files that have the amazon copyright on them.
-          files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lrniE "copyright (.*) [0-9]{4} amazon.com" )
+          # -l Provides a list of the files
+          # -r Means do a recursive search
+          # -i tells it to ignore the case
+          files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" )
 
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
@@ -92,7 +96,9 @@ runs:
           echo "::endgroup::"
 
           # Run a git diff to print the differences if any exist, return an error code if there are any
+          echo "::group::File Difference"
           git diff --exit-code
+          echo "::endgroup::"
           if [ "$?" = "0" ]; then
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else

@@ -555,7 +555,6 @@ jobs:
         id: exe-monitor-find-exit-code
         uses: ./executable-monitor
         with:
-          description:
           exe-path: executable-monitor/test.out
           success-line: "LINE_THAT_WILL_NOT_PRINT"
           success-exit-code: 0
@@ -712,7 +711,6 @@ jobs:
       uses: ./executable-monitor
       continue-on-error: true
       with:
-        description: ""
         exe-path: executable-monitor/test.out
         # This is an exit status that should be met if not for timeou
         success-exit-code: 0

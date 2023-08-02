@@ -68,17 +68,21 @@ runs:
         working-directory: ${{ inputs.path }}
         run: |
           # ${{ env.stepName }}
+          echo -e "${{ env.bashInfo }} clang-format --version ${{ env.bashEnd }}
           echo -e "${{ env.bashInfo }} Using clang-format version :$(clang-format --version) ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
-          clang-format --version
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
           # This would mean the first time a file fails the check that we exit without formatting all files.
           set +e
 
-          # Get all files that end in .c or .h. Exclude any files or directories that we were asked to.
+          # Get all files that end in .c or .h.
+          # Exclude any files or directories that we were asked to.
           # Then limit the search to files that have the amazon copyright on them.
-          files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lrniE "copyright (.*) [0-9]{4} amazon.com" )
+          # -l Provides a list of the files
+          # -r Means do a recursive search
+          # -i tells it to ignore the case
+          files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" )
 
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
@@ -104,9 +108,10 @@ runs:
             fi
           done
           echo "::endgroup::"
-
+          echo "::group::File Difference"
           # Run a git diff to print the differences if any exist, return an error code if there are any
           git diff --exit-code
+          echo "::endgroup::"
           if [ "$?" = "0" ]; then
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
