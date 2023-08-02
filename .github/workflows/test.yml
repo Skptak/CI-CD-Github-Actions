@@ -158,7 +158,7 @@ jobs:
 
       - env:
           stepName: "Functional | Success | Exclude Files"
-          name: ${{ env.stepName }}
+        name: ${{ env.stepName }}
         id: exclude-files-with-errors
         uses: ./formatting
         with:  
@@ -168,7 +168,7 @@ jobs:
 
       - env:
           stepName: "Functional | Success | Exclude File and Exclude Dirs"
-          name: ${{ env.stepName }}
+        name: ${{ env.stepName }}
         id: exclude-single-dir-multiple-files
         uses: ./formatting
         with:

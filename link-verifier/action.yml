@@ -84,7 +84,7 @@ runs:
         exitStatus=$?
         set -e
         echo "::endgroup::"
-        if [ "$?" = "0" ]; then
+        if [ "$exitStatus" = "0" ]; then
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
           set -e
           exit 1

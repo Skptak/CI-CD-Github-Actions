@@ -17,13 +17,13 @@ runs:
   using: "composite"
   steps:
       - name: Install Uncrustify
+        shell: bash
         run: |
           : # Install Uncrustify
           echo "::group::Install Uncrustify"
           sudo apt-get install uncrustify
           sudo apt-get install clang-format
           echo "::endgroup::"
-        shell: bash
 
       - env:
           stepName: Validate Inputs
@@ -59,6 +59,7 @@ runs:
       - env:
           stepName: Run Uncrustify
         name: ${{ env.stepName }}
+        if: ${{ steps.validate-inputs.outcome}} = "success" && os.version == "ubuntu-20.04"
         working-directory: ${{ inputs.path }}
         shell: bash
         run: |
@@ -112,8 +113,7 @@ runs:
         # Use this so that even if we fail formatting these checks run
         # Solves the issue of "Make commit to fix formatting, to then learn
         # You need to fix whitespace
-        if: success() || failure()
-        continue-on-error: true
+        if: ${{ steps.validate-inputs.outcome}} = "success" && os.version == "ubuntu-latest"
         working-directory: ${{ inputs.path }}
         run: |
           # ${{ env.stepName }}
@@ -175,7 +175,7 @@ runs:
         # Use this so that even if we fail formatting these checks run
         # Solves the issue of "Make commit to fix formatting, to then learn
         # You need to fix whitespace
-        if: success() || failure()
+        if: success() || failure() && ${{ steps.validate-inputs.outcome}} = "success"
         working-directory: ${{ inputs.path }}
         run: |
           # ${{ env.stepName }}
@@ -193,7 +193,7 @@ runs:
       - env:
           stepName: Check for CRLF
         name: ${{ env.stepName }}
-        if: success() || failure()
+        if: success() || failure() && ${{ steps.validate-inputs.outcome}} = "success"
         working-directory: ${{ inputs.path }}
         shell: bash
         run: |
