@@ -15,6 +15,52 @@ env:
   bashEnd:    \033[0m
 
 jobs:
+
+  uncrustify-formatting-success-cases:
+      runs-on: ubuntu-20.04
+      steps:
+      - uses: actions/checkout@v3
+
+      - env:
+          stepName: "Functional | Success | Exclude All Error Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-dirs-with-errors
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
+          exclude-files: "badFile.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude Files"
+        name: ${{ env.stepName }}
+        id: exclude-files-with-errors
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: ",,,"
+          exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude File and Exclude Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-single-dir-multiple-files
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "goodFiles"
+          exclude-files: "cgc_error.h,main-blinky.c,test.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude Files and Exclude Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-two-files-two-dirs
+        uses: ./formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
+          exclude-files: "test.c,cgc_error.h,main-blinky.c,badFile.c"
+
   uncrustify-formatting-error-cases:
     runs-on: ubuntu-20.04
     steps:
@@ -190,6 +236,52 @@ jobs:
             exitStatus=1
           fi
           exit $exitStatus
+
+  clang-formatting-success-cases:
+      runs-on: ubuntu-latests
+      steps:
+      - uses: actions/checkout@v3
+
+      - env:
+          stepName: "Functional | Success | Exclude All Error Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-dirs-with-errors
+        uses: ./clang-formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
+          exclude-files: "badFile.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude Files"
+        name: ${{ env.stepName }}
+        id: exclude-files-with-errors
+        uses: ./clang-formatting
+        with:
+          path: formatting
+          exclude-dirs: ",,,"
+          exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude File and Exclude Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-single-dir-multiple-files
+        uses: ./clang-formatting
+        with:
+          path: formatting
+          exclude-dirs: "goodFiles"
+          exclude-files: "cgc_error.h,main-blinky.c,test.c"
+
+      - env:
+          stepName: "Functional | Success | Exclude Files and Exclude Dirs"
+        name: ${{ env.stepName }}
+        id: exclude-two-files-two-dirs
+        uses: ./clang-formatting
+        with:
+          path: formatting
+          exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
+          exclude-files: "test.c,cgc_error.h,main-blinky.c,badFile.c"
+
   clang-formatting-error-cases:
     runs-on: ubuntu-latest
     steps:
@@ -365,96 +457,6 @@ jobs:
             exitStatus=1
           fi
           exit $exitStatus
-
-  uncrustify-formatting-success-cases:
-      runs-on: ubuntu-20.04
-      steps:
-      - uses: actions/checkout@v3
-
-      - env:
-          stepName: "Functional | Success | Exclude All Error Dirs"
-        name: ${{ env.stepName }}
-        id: exclude-dirs-with-errors
-        uses: ./formatting
-        with:
-          path: formatting
-          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
-          exclude-files: "badFile.c"
-
-      - env:
-          stepName: "Functional | Success | Exclude Files"
-        name: ${{ env.stepName }}
-        id: exclude-files-with-errors
-        uses: ./formatting
-        with:  
-          path: formatting
-          exclude-dirs: ",,,"
-          exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
-
-      - env:
-          stepName: "Functional | Success | Exclude File and Exclude Dirs"
-        name: ${{ env.stepName }}
-        id: exclude-single-dir-multiple-files
-        uses: ./formatting
-        with:
-          path: formatting
-          exclude-dirs: "goodFiles"
-          exclude-files: "cgc_error.h,main-blinky.c,test.c"
-
-      - env:
-          stepName: "Functional | Success | Exclude Files and Exclude Dirs"
-        name: ${{ env.stepName }}
-        id: exclude-two-files-two-dirs
-        uses: ./formatting
-        with:
-          path: formatting
-          exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
-          exclude-files: "test.c,cgc_error.h,main-blinky.c"
-
-  clang-formatting-success-cases:
-      runs-on: ubuntu-latests
-      steps:
-      - uses: actions/checkout@v3
-
-      - env:
-          stepName: "Functional | Success | Exclude All Error Dirs"
-        name: ${{ env.stepName }}
-        id: exclude-dirs-with-errors
-        uses: ./clang-formatting
-        with:
-          path: formatting
-          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
-          exclude-files: "badFile.c"
-
-      - env:
-          stepName: "Functional | Success | Exclude Files"
-        name: ${{ env.stepName }}
-        id: exclude-files-with-errors
-        uses: ./clang-formatting
-        with:  
-          path: formatting
-          exclude-dirs: ",,,"
-          exclude-files: "badFile.c,cgc_error.h,main-blinky.c,test.c"
-
-      - env:
-          stepName: "Functional | Success | Exclude File and Exclude Dirs"
-        name: ${{ env.stepName }}
-        id: exclude-single-dir-multiple-files
-        uses: ./clang-formatting
-        with:
-          path: formatting
-          exclude-dirs: "goodFiles"
-          exclude-files: "cgc_error.h,main-blinky.c,test.c"
-
-      - env:
-          stepName: "Functional | Success | Exclude Files and Exclude Dirs"
-        name: ${{ env.stepName }}
-        id: exclude-two-files-two-dirs
-        uses: ./clang-formatting
-        with:
-          path: formatting
-          exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
-          exclude-files: "test.c,cgc_error.h,main-blinky.c"
 
   test-exe-monitor-success-cases:
     strategy:
