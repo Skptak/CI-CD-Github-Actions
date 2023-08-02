@@ -8,21 +8,45 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Install spell
+      - env:
+          stepName: Install Spell
+        name: ${{ env.stepName }}
         run: |
+          #  ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
           sudo apt-get install spell
           sudo apt-get install util-linux
           sudo apt-get install npm
           npm install -g cspell
+          echo "::endgroup::"
         shell: bash
-      - name: Check spelling
+      - env:
+          bashPass:   \033[32;1mPASSED -
+          bashInfo:   \033[33;1mINFO -
+          bashFail:   \033[31;1mFAILED -
+          bashEnd:    \033[0m
+          stepName: Check Spelling
+        name: ${{ env.stepName}}
         working-directory: ${{ inputs.path }}
         run: |
+          #  ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
+          set +e
+          pwd
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           cspell --language-id C --unique --words-only "**/*.c" "**/*.h" | sort --ignore-case >> $GITHUB_ACTION_PATH/shared-dict.txt
+          exitStatus=$?
           cd $GITHUB_ACTION_PATH/
           git add shared-dict.txt
           git commit -m "Updating shared-dict.txt"
           git push origin main
+          set -e
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
         shell: bash
