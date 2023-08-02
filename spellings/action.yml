@@ -33,11 +33,13 @@ runs:
           echo "::group::${{ env.stepName }}"
           set +e
           pwd
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "<>"
           cspell --language-id C --unique --words-only "**/*.c" "**/*.h" | sort --ignore-case >> $GITHUB_ACTION_PATH/shared-dict.txt
           exitStatus=$?
           cd $GITHUB_ACTION_PATH/
+          pwd
+          ls
           git add shared-dict.txt
           git commit -m "Updating shared-dict.txt"
           git push origin main
