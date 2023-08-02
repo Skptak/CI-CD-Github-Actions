@@ -102,7 +102,7 @@ jobs:
         uses: ./formatting
         with:
           path: formatting
-          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
+          exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
           exclude-files: "badFile.c"
 
       - env:
@@ -238,7 +238,7 @@ jobs:
           exit $exitStatus
 
   clang-formatting-success-cases:
-      runs-on: ubuntu-latests
+      runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v3
 
@@ -323,7 +323,7 @@ jobs:
         uses: ./clang-formatting
         with:
           path: formatting
-          exclude-dirs: "filesWithFormattingErrors,filesWithCRLFEndings,filesWithTrailingWhitespace"
+          exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
           exclude-files: "badFile.c"
 
       - env:

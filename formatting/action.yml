@@ -16,11 +16,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Install Uncrustify
+      - env:
+          stepName: Install Uncrustify
         shell: bash
         run: |
-          : # Install Uncrustify
-          echo "::group::Install Uncrustify"
+          # ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
           sudo apt-get install uncrustify
           echo "::endgroup::"
 
@@ -58,7 +59,7 @@ runs:
       - env:
           stepName: Run Uncrustify
         name: ${{ env.stepName }}
-        if: ${{ steps.validate-inputs.outcome}} = "success" && os.version == "ubuntu-20.04"
+        if: ${{ steps.validate-inputs.outcome}} = "success"
         working-directory: ${{ inputs.path }}
         shell: bash
         run: |
@@ -89,7 +90,7 @@ runs:
 
             # If the previous command failed then print out an error message as well as the output
             if [ "$?" != "0" ]; then
-              echo -e "${{ env.bashFail }} Error parsing "$file": ${{ env.bashEnd }}\n"
+              echo -e "${{ env.bashFail }} Error parsing "$file" ${{ env.bashEnd }}"
               echo -e "$fileOut"
             fi
           done
