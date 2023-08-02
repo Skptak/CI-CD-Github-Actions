@@ -8,6 +8,8 @@ set -o pipefail
 set -o errexit
 set -f
 
+YELLOW="\033[33;1mINFO -"
+END="\033[0m"
 BLUE="\e[1;34m"
 GREEN="\e[1;32m"
 DEFAULTFG="\e[39m"
@@ -123,6 +125,7 @@ do
         # search and reuse it within the if statement (I gave up trying
         # to find one after a few minutes), that would be nice.
         #
+        echo -e "$YELLOW Extracting comments from $file $END"
         extract-comments $file | grep -iw $word > /dev/null
         if [ $? == "0" ]
         then
