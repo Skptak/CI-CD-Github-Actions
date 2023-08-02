@@ -2,7 +2,7 @@ name: 'formatting'
 description: 'CI formatting check'
 inputs:
   path:
-    description: 'Path to repository folder to run formatting check for.'
+    description: 'Path to repository folder to run formatting check for. '
     required: false
     default: ./
   exclude-files:
