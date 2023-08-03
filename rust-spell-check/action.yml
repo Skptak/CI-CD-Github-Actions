@@ -9,26 +9,42 @@ inputs:
     description: 'Path to lexicon file to check spellings with'
     required: false
     default: lexicon.txt
+  exclude-dirs:
+    description: "Comma separated list of directories to not spell check"
+    required: false
+  exclude-files:
+    description: "Comma separated list of files to not spell check"
+    required: false
+  include-files:
+    description: "Comma separated list of files to match to regex"
+    required: false
+
 
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v3
     - env:
+        bashPass: \033[32;1mPASSED -
+        bashInfo: \033[33;1mINFO -
+        bashFail: \033[31;1mFAILED -
+        bashEnd: \033[0m
         stepName: Install aspell
       name: ${{ env.stepName }}
       shell: bash
       run: |
-        # Install aspell
-        # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-        echo "::group::Install aspell"
+        # ${{ env.stepName }}
+        echo "::group::${{ env.stepName }}"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         sudo apt-get install aspell libaspell-dev util-linux
-        if [ "$?" = "0" ]; then
+        exitStatus=$?
         echo "::endgroup::"
-          echo -e "\033[32;3mInstalled Aspell Succesfully\033[0m"
+        if [ "$exitStatus" = "0" ]; then
+          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
         else
-          echo -e "\033[32;31mAspell Installation Failed...\033[0m"
+          echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
           exit 1
-        fi
+        fi       
     
     - name: Install rust toolchain
       uses: actions-rs/toolchain@v1
@@ -37,48 +53,48 @@ runs:
           override: true
           components: rustfmt, clippy
 
-    - name: Compile Spell checker
+    - env:
+        stepName: Compile Spell checker
+      name: ${{ env.stepName }}
       id: compile-spell-chcker
       working-directory: .
       shell: bash
       run: | 
-        # Compile Spell Checker
-        echo "::group::Compile Spell Checker"
+        # ${{ env.stepName }}
+        echo "::group::${{ env.stepName }}"
         PATH=$PATH:/home/runner/.cargo/bin
         cargo --version
-        echo "GITHUB_ACTION_PATH/rust-spell-check=$GITHUB_ACTION_PATH"
-        ls $GITHUB_ACTION_PATH
-        cd $GITHUB_ACTION_PATH
         cargo build --release
         target/release/spell-checker --help
         exitStatus=$?
-        echo "::endgroup::"
-        if [ "$exitStatus" = "0" ]; then
-          echo -e "\e[0;32mBuilt the spell checker\e[0m"
-        else
-          echo -e "\e[0;32mFailed to build the spell checker\e[0m"
-          # If there is an error, set this flag high again so the exit 1 fails the run
-          set -e
-          exit 1
-        fi
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi       
 
-    - name: Run Spell Checker
+    - env:
+        stepName: Run Spell Checker
+      name: ${{ env.stepName }}
       id: run-spell-checker
       working-directory: ${{ inputs.path }}
+      shell: bash
       run: |
-        # Run Spell Checker
-        echo "::group::Run Spell Checker"
+        # ${{ env.stepName }}
+        echo "::group::${{ env.stepName }}"
         PATH=$PATH:$GITHUB_ACTION_PATH/target/release
-        find . -iname "*.[ch]"| xargs spell-checker -c -w ${{ inputs.lexicon}}
+        PATH=$PATH:$GITHUB_ACTION_PATH/../
+        getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-files="${{ inputs.include-files }}
+        spell-checker -c -w ${{ inputs.lexicon}}
         exitStatus=$?
         echo "::endgroup::"
         if [ "$exitStatus" = "0" ]; then
-          echo -e "\e[0;32mRan the spell checker\e[0m"
+          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
         else
-          echo -e "\e[0;32mFailed to run the spell checker\e[0m"
-          # If there is an error, set this flag high again so the exit 1 fails the run
-          set -e
+          echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
           exit 1
-        fi
-      shell: bash
+        fi       
+      
 
