@@ -6,16 +6,15 @@ bashEnd="\033[0m"
 
 output=$(getopt -V)
 if [[ *"getopt"* == "$output" ]] && [ $# != 0 ]; then
-        echo -e "$bashInfo This script cannot parse options from Mac command line's default 'getopt' $bashEnd"
-        echo -e "$bashInfo Run \"brew install gnu-getopt\" and then add it to your path using $bashEnd"
-        echo -e "$bashInfo export PATH=\"/opt/homebrew/opt/gnu-getopt/bin:\$PATH\" $bashEnd"
-        echo -e "$bashInfo At which point you can then use this script with options $bashEnd"
-        exit 1;
+    echo -e "$bashInfo This script cannot parse options from Mac command line's default 'getopt' $bashEnd"
+    echo -e "$bashInfo Run \"brew install gnu-getopt\" and then add it to your path using $bashEnd"
+    echo -e "$bashInfo export PATH=\"/opt/homebrew/opt/gnu-getopt/bin:\$PATH\" $bashEnd"
+    echo -e "$bashInfo At which point you can then use this script with options $bashEnd"
+    exit 1;
 fi
 # Check number of arguments
 files=""
 file=""
-regexPattern="(.(c|h)$)"
 if [ $# != 0 ]; then 
     VALID_ARGS=$(getopt -o h,ed:,ef:,if: --long help,exclude-dirs:,exclude-files:,include-files: -- "$@")
     eval set -- "$VALID_ARGS"
@@ -36,15 +35,6 @@ if [ $# != 0 ]; then
             if | --include-files )
                 # echo -e "$bashInfo Parsed --include-files as: $2 $bashEnd"
                 includeFiles=$(echo "$2" | tr -d " ")
-                # echo "$2"
-                # echo -e "IncludeFiles = "$includeFiles""
-                # By default we do a regex match for any file
-                # That ends in a .c or a .h
-                regexPattern="(.(c|h)$|("
-                # Replace any commas in the includeFiles with a pipe
-                regexPattern+=$(echo "$includeFiles" | tr , \|) 
-                # Add the end of the regex pattern
-                regexPattern+="))"
                 shift 2
                 ;;
 
@@ -66,34 +56,10 @@ if [ $# != 0 ]; then
 fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    grepArgs="-sliE copyright (.*) 20[0-9]{2} amazon.com"
+    grepArgs="-sliE \"copyright (.*) 20[0-9]{2} amazon.com\""
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    grepArgs="-slie copyright (.*) 20\d\d amazon.com"
+    grepArgs="-slie \"copyright (.*) 20\d\d amazon.com\""
 fi
-
-
-    # Command for fd
-#if [ command -v fd &> /dev/null ]; then
-#    # Use regex to match the pattern
-#   # echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
-#    # Exclude any files we were asked to
-#    # Then perform a grep for the amazon copyright in found files
-#   # echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
-#    export files=($(fd --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" \
-#                --exec grep $grepArgs "copyright (.*) 20\d\d amazon.com" ))
-#
-#    # Command for fdfind
-#elif [ command -v fdfind &> /dev/null ]; then
-#    # Use regex to match the pattern
-#    #echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
-#    # Exclude any files we were asked to
-#    # Then perform a grep for the amazon copyright in found files
-#    #echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
-#    fdfind --regex "$regexPattern" --exec grep "$grepArgs"
-#    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs"
-#    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs" --exclude "{$excludeDirs}"
-#    export files=($(fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" --exec grep "$grepArgs" ))
-#
 
 # Adding both OS's here to make it work for local testing on Mac
 # So this grep grabs all .c and .h files that have the amazon copyright
@@ -105,7 +71,7 @@ fi
 # -r : Recursively search through all directories
 # -i : Do a case insensitive search 
 # -e : Use regex for the search
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     #echo -e "$bashInfo Using Grep Search with Command:$bashEnd"
     #echo -e "$bashInfo grep --include={*.[ch],$includeFiles,} --exclude={$excludeFiles,} --exclude-dir={$excludeDirs,} -lriE \"copyright (.*) [0-9]{4} amazon.com\"$bashEnd"
     export files=($(grep --include={*.[ch],$includeFiles,} --exclude={$excludeFiles,} --exclude-dir={$excludeDirs,} -lriE "copyright (.*) [0-9]{4} amazon.com" ))
