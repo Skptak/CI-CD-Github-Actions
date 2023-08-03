@@ -28,7 +28,7 @@ jobs:
         working-directory: clang-formatting
         run: |
           # ${{ env.stepName }}
-          "echo::group::${{ env.stepName }}"
+          echo "::group::${{ env.stepName }}"
           sudo apt install fd-find
           fd-find --version
           exitStatus=$?
@@ -47,7 +47,7 @@ jobs:
         working-directory: clang-formatting
         run: |
           # ${{ env.stepName }}
-          "echo::group::${{ env.stepName }}"
+          echo "::group::${{ env.stepName }}"
           export PATH="$(readlink -f ../.):$PATH"
           allFiles=$(grep -sril "copyright.*amazon" --include="*.c" --include="*.h")
           getFiles
@@ -73,7 +73,7 @@ jobs:
         working-directory: clang-formatting
         run: |
           # ${{ env.stepName }}
-          "echo::group::${{ env.stepName }}"
+          echo "::group::${{ env.stepName }}"
           getFiles --exclude-filess="test.c"
           exitStatus=0
           if [[ $files == *"test.c"* ]]; then
@@ -95,7 +95,7 @@ jobs:
         working-directory: clang-formatting
         run: |
           # ${{ env.stepName }}
-          "echo::group::${{ env.stepName }}"
+          echo "::group::${{ env.stepName }}"
           getFiles --exclude-dirs="goodFiles"
           exitStatus=0
           if [[ $files == *"goodFiles"* ]]; then
@@ -117,7 +117,7 @@ jobs:
         working-directory: clang-formatting
         run: |
           # ${{ env.stepName }}
-          "echo::group::${{ env.stepName }}"
+          echo "::group::${{ env.stepName }}"
           getFiles --exclude-dirs="goodFiles" --exclude-files="test.c"
           exitStatus=0
           if [[ $files == *"test.c"* ]]; then
@@ -139,7 +139,7 @@ jobs:
         working-directory: clang-formatting
         run: |
           # ${{ env.stepName }}
-          "echo::group::${{ env.stepName }}"
+          echo "::group::${{ env.stepName }}"
           getFiles --include-files="README.md"
           exitStatus=0
           if [[ $files != *"README.md"* ]]; then
@@ -161,7 +161,7 @@ jobs:
         working-directory: clang-formatting
         run: |
           # ${{ env.stepName }}
-          "echo::group::${{ env.stepName }}"
+          echo "::group::${{ env.stepName }}"
           getFiles --exclude-dirs="filesWithCRLFEndings,include" --exclude-files="fileFormattedWithClangFormatV16.c,badFile.c"
           exitStatus=0
           if [[ $files == *"fileFormattedWithClangFormatV16.c"* ]]; then
@@ -345,7 +345,7 @@ jobs:
         id: check-failure-test-cases
         shell: bash
         run: |
-          # Check Failure Test Cases
+          # ${{ env.stepName }}
           exitStatus=0
           if [ "${{ steps.all-format-errors.outcome}}" = "failure" ]; then
             echo -e "${{ env.bashPass }} Functional | Failure | Whitespace, CRLF, and Format Failure |  Had Expected "failure" ${{ env.bashEnd }}"
@@ -566,7 +566,7 @@ jobs:
         id: check-failure-test-cases
         shell: bash
         run: |
-          # Check Failure Test Cases
+          # ${{ env.stepName }}
           exitStatus=0
           if [ "${{ steps.all-format-errors.outcome}}" = "failure" ]; then
             echo -e "${{ env.bashPass }} Functional | Failure | Whitespace, CRLF, and Format Failure |  Had Expected "failure" ${{ env.bashEnd }}"
@@ -652,7 +652,7 @@ jobs:
         if: runner.os == 'Linux'
         id: install-ubuntu-build--tools
         run: |
-          # Install Ubuntu Build Tools
+          # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
           sudo apt install build-essential
           exitStatus=$?
@@ -947,7 +947,7 @@ jobs:
       id: check-failure-test-cases
       shell: bash
       run: |
-        # Check Failure Test Cases
+        # ${{ env.stepName }}
         if [ "${{ steps.exe-monitor-fail-no-exe.outcome}}" = "failure" ]; then
           echo -e "${{ env.bashPass }}  | No Executable Provided | Failed As Intended ${{ env.bashEnd }}"
         else
