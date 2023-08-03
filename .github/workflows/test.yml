@@ -49,10 +49,13 @@ jobs:
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
           export PATH="$(readlink -f ../.):$PATH"
+          export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           allFiles=$(grep -sril "copyright.*amazon" --include="*.c" --include="*.h")
           files=$(getFiles)
           exitStatus=0
-          for file in $allFiles ; do
+          # Loop through all the files we found using grep
+          for file in ${allFiles[@]} ; do
+            # Check if they're in the flattened version of getFiles() search
             if ! [[ $files == *"$file"* ]]; then
               echo -e "${{ env.bashFail }} Get Files did not find file: $file ${{ env.bashEnd }}"
               exitStatus=1
