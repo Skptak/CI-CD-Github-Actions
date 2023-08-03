@@ -30,7 +30,7 @@ jobs:
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
           sudo apt install fd-find
-          fd-find --version
+          fdfind --version
           exitStatus=$?
           echo "::endgroup::"
           if [ "$exitStatus" = "0" ]; then
