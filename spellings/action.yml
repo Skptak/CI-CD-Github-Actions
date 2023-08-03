@@ -50,28 +50,18 @@ runs:
           ls $GITHUB_ACTION_PATH
           readlink -f "$GITHUB_ACTION_PATH"/../.
           export PATH=$(readlink -f "$GITHUB_ACTION_PATH"/../.):$PATH
-          getFiles() --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files=${{ inputs.exclude-files }} --include-files= ${{ inputs.include-files}}
+          file=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files=${{ inputs.exclude-files }} --include-files= ${{ inputs.include-files}})
           #files=($(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" ))
           for file in ${files[@]}; do
             echo -e "${{ env.bashInfo }} Checking Spelling of: "$file" ${{ env.bashEnd }}"
             # Call cspell with the C language option. 
             # Enable colour output
-            # Use the config file from the CI-CD Github action
-            # Use current directory as root
+            # Use the config file in the repository calling it
+            # Show suggestions for correct spellings
             # Check Spelling of words in file
-            cspell --language-id C --unique --color -c $GITHUB_ACTION_PATH/cspell.json --root . $file
-            cspell --language-id C --unique --words-only $file >> $GITHUB_ACTION_PATH/shared-dict.txt
+            cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context $file
           done
           exitStatus=$?
-          cd $GITHUB_ACTION_PATH/
-          pwd
-          ls
-          cd $GITHUB_ACTION_PATH
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "<>
-          git add shared-dict.txt
-          git commit -m "Updating shared-dict.txt"
-          git push origin main
           set -e
           echo "::endgroup::"
           if [ "$exitStatus" = "0" ]; then

@@ -9,7 +9,7 @@ useGitignore: true
 # That having just one single dictionary might be nicer?
 dictionaryDefinitions:
   - name: freertos-words
-    path: '/home/ANT.AMAZON.COM/skptak/repos/fork/CI-CD-Github-Actions_Soren/spellings/freeRTOS-words.txt'
+    path: '.cSpellWords.txt'
     addWords: true
 dictionaries:
   - freertos-words

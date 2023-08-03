@@ -50,7 +50,7 @@ jobs:
           echo "::group::${{ env.stepName }}"
           export PATH="$(readlink -f ../.):$PATH"
           allFiles=$(grep -sril "copyright.*amazon" --include="*.c" --include="*.h")
-          getFiles
+          files=$(getFiles)
           exitStatus=0
           for file in $allFiles ; do
             if ! [[ $files == *"$file"* ]]; then
@@ -74,7 +74,7 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          getFiles --exclude-filess="test.c"
+          files=$(getFiles --exclude-filess="test.c")
           exitStatus=0
           if [[ $files == *"test.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a file it should have skipped: test.c ${{ env.bashEnd }}"
@@ -96,7 +96,7 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          getFiles --exclude-dirs="goodFiles"
+          files=$(getFiles --exclude-dirs="goodFiles")
           exitStatus=0
           if [[ $files == *"goodFiles"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
@@ -118,7 +118,7 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          getFiles --exclude-dirs="goodFiles" --exclude-files="test.c"
+          files=$(getFiles --exclude-dirs="goodFiles" --exclude-files="test.c")
           exitStatus=0
           if [[ $files == *"test.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
@@ -140,7 +140,7 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          getFiles --include-files="README.md"
+          files=$(getFiles --include-files="README.md")
           exitStatus=0
           if [[ $files != *"README.md"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
@@ -162,7 +162,7 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          getFiles --exclude-dirs="filesWithCRLFEndings,include" --exclude-files="fileFormattedWithClangFormatV16.c,badFile.c"
+          files=$(getFiles --exclude-dirs="filesWithCRLFEndings,include" --exclude-files="fileFormattedWithClangFormatV16.c,badFile.c")
           exitStatus=0
           if [[ $files == *"fileFormattedWithClangFormatV16.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: fileFormattedWithClangFormatV16.c ${{ env.bashEnd }}"
