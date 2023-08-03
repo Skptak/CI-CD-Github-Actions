@@ -52,6 +52,8 @@ jobs:
           export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           allFiles=$(grep -sril "copyright.*amazon" --include="*.c" --include="*.h")
           files=$(getFiles)
+          echo -e "${{ env.bashInfo }} allFiles:\n$allFiles ${{ env.bashInfo }}"
+          echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashInfo }}"
           exitStatus=0
           # Loop through all the files we found using grep
           for file in ${allFiles[@]} ; do
@@ -80,10 +82,14 @@ jobs:
           echo "::group::${{ env.stepName }}"
           export PATH="$(readlink -f ../.):$PATH"
           export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
-          files=$(getFiles --exclude-filess="test.c")
+          files=$(getFiles --exclude-files="test.c")
+          echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashInfo }}"
           exitStatus=0
           if [[ $files == *"test.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a file it should have skipped: test.c ${{ env.bashEnd }}"
+            exitStatus=1
+          elif [[ files != *"tasks.c"* ]]
+            echo -e "${{ env.bashFail }} Get Files Did not find a file it should have: tasks.c ${{ env.bashEnd }}"
             exitStatus=1
           fi
           echo "::endgroup::"
@@ -105,6 +111,7 @@ jobs:
           export PATH="$(readlink -f ../.):$PATH"
           export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-dirs="goodFiles")
+          echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashInfo }}"
           exitStatus=0
           if [[ $files == *"goodFiles"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
@@ -129,6 +136,7 @@ jobs:
           export PATH="$(readlink -f ../.):$PATH"
           export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-dirs="goodFiles" --exclude-files="test.c")
+          echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashInfo }}"
           exitStatus=0
           if [[ $files == *"test.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
@@ -153,6 +161,7 @@ jobs:
           export PATH="$(readlink -f ../.):$PATH"
           export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           files=$(getFiles --include-files="README.md")
+          echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashInfo }}"
           exitStatus=0
           if [[ $files != *"README.md"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
@@ -177,6 +186,7 @@ jobs:
           export PATH="$(readlink -f ../.):$PATH"
           export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-dirs="filesWithCRLFEndings,include" --exclude-files="fileFormattedWithClangFormatV16.c,badFile.c")
+          echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashInfo }}"
           exitStatus=0
           if [[ $files == *"fileFormattedWithClangFormatV16.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: fileFormattedWithClangFormatV16.c ${{ env.bashEnd }}"
