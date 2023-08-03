@@ -2,7 +2,7 @@ name: 'formatting'
 description: 'CI formatting check'
 inputs:
   path:
-    description: 'Path to repository folder to run formatting check for.'
+    description: 'Path to repository folder to run formatting check for. '
     required: false
     default: ./
   exclude-files:
@@ -17,12 +17,13 @@ runs:
   using: "composite"
   steps:
       - env:
-          stepName: Install Uncrustify
+          stepName: Install Clang Format
+        name: ${{ env.stepName }}
         shell: bash
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          sudo apt-get install uncrustify
+          sudo apt-get install clang-format
           echo "::endgroup::"
 
       - env:
@@ -57,14 +58,14 @@ runs:
           exit $exitStatus
 
       - env:
-          stepName: Run Uncrustify
+          stepName: Run Clang Format
         name: ${{ env.stepName }}
         if: ${{ steps.validate-inputs.outcome}} = "success"
         working-directory: ${{ inputs.path }}
         shell: bash
         run: |
           # ${{ env.stepName }}
-          echo -e "${{ env.bashInfo }} Using Uncrustify version "$(uncrustify --version)" ${{ env.bashEnd }}"
+          echo -e "${{ env.bashInfo }} Using clang-format version "$(clang-format --version)" ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
@@ -86,8 +87,7 @@ runs:
 
             # Pipe the output of the command to a variable
             # This way we can print the command only if it fails
-            fileOut=$(uncrustify --no-backup --replace --if-changed -c $GITHUB_ACTION_PATH/uncrustify.cfg -l C $file 2>&1)
-
+            fileOut=$(clang-format -i --verbose --style=file $file)
             # If the previous command failed then print out an error message as well as the output
             if [ "$?" != "0" ]; then
               echo -e "${{ env.bashFail }} Error parsing "$file" ${{ env.bashEnd }}"
@@ -95,7 +95,6 @@ runs:
             fi
           done
           echo "::endgroup::"
-
           # Run a git diff to print the differences if any exist, return an error code if there are any
           echo "::group::File Difference"
           git diff --exit-code
