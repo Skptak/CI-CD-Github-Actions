@@ -13,6 +13,11 @@ inputs:
     description: 'List of comma-separated directories to exclude from trailing whitespace formatting check. Eg docs,build'
     required: false
     default: ''
+  include-files:
+    description: 'List of comma-separated files to include into the spell check. Eg docs,build'
+    required: false
+    default: ''
+
 runs:
   using: "composite"
   steps:
@@ -42,7 +47,11 @@ runs:
           echo "::group::${{ env.stepName }}"
           set +e
           pwd
-          files=($(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" ))
+          ls $GITHUB_ACTION_PATH
+          readlink -f "$GITHUB_ACTION_PATH"/../.
+          export PATH=$(readlink -f "$GITHUB_ACTION_PATH"/../.):$PATH
+          getFiles() --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files=${{ inputs.exclude-files }} --include-files= ${{ inputs.include-files}}
+          #files=($(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" ))
           for file in ${files[@]}; do
             echo -e "${{ env.bashInfo }} Checking Spelling of: "$file" ${{ env.bashEnd }}"
             # Call cspell with the C language option. 
@@ -51,7 +60,7 @@ runs:
             # Use current directory as root
             # Check Spelling of words in file
             cspell --language-id C --unique --color -c $GITHUB_ACTION_PATH/cspell.json --root . $file
-            cspell --language-id C --unique --words-only $files >> $GITHUB_ACTION_PATH/shared-dict.txt
+            cspell --language-id C --unique --words-only $file >> $GITHUB_ACTION_PATH/shared-dict.txt
           done
           exitStatus=$?
           cd $GITHUB_ACTION_PATH/

@@ -66,9 +66,9 @@ if [ $# != 0 ]; then
 fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    grepArgs="-sliE"
+    grepArgs="-sliE \"copyright (.*) 20[0-9]{2} amazon.com\""
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    grepArgs="-slie"
+    grepArgs="-slie \"copyright (.*) 20\d\d amazon.com\""
 fi
 
 
@@ -78,9 +78,8 @@ if [ command -v fd &> /dev/null ]; then
     echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
     # Exclude any files we were asked to
     # Then perform a grep for the amazon copyright in found files
-    echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep -slie \"copyright (.*) 20\d\d amazon.com\"\n $bashEnd"
-    files=($(fd --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" \
-                --exec grep $grepArgs "copyright (.*) 20\d\d amazon.com" ))
+    echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
+    files=($(fd --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" --exec grep "$grepArgs" ))
 
 # Command for fdfind
 elif [ command -v fdfind &> /dev/null ]; then
@@ -88,9 +87,8 @@ elif [ command -v fdfind &> /dev/null ]; then
     echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
     # Exclude any files we were asked to
     # Then perform a grep for the amazon copyright in found files
-    echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep -slie \"copyright (.*) 20\d\d amazon.com\"\n $bashEnd"
-    files=($(fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" \
-                --exec grep $grepArgs "copyright (.*) 20\d\d amazon.com" ))
+    echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
+    export files=($(fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" --exec grep "$grepArgs" ))
 
 
 # Adding both OS's here to make it work for local testing on Mac

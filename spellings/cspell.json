@@ -4,11 +4,18 @@
     "dictionaryDefinitions": [
         {
             "name": "shared-dictionary",
-            "path": "/Users/skptak/repos/fork/CI-CD-Github-Actions_Soren/spellings/shared-dictionary.txt",
+            "path": "./shared-dictionary.txt",
             "addWords": true
         }
     ],
+    "dictionaries": ["freertos-words"],
     "ignorePaths": [
-        "dependency"
+        "dependency",
+        "/project-words.txt",
+        "dependency",
+        "docs",
+        "ThirdParty"
     ],
+    "allowCompoundWords": true,
+    "useGitignore": true
 }
