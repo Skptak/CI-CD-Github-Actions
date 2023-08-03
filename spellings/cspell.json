@@ -16,6 +16,6 @@
         "docs",
         "ThirdParty"
     ],
-    "allowCompoundWords": true,
+    "allowCompoundWords": true
     "useGitignore": true
 }
