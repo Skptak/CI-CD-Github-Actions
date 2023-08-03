@@ -89,6 +89,9 @@ elif [ command -v fdfind &> /dev/null ]; then
     # Exclude any files we were asked to
     # Then perform a grep for the amazon copyright in found files
     #echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
+    fdfind --regex "$regexPattern" --exec grep "$grepArgs"
+    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs"
+    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs" --exclude "{$excludeDirs}"
     export files=($(fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" --exec grep "$grepArgs" ))
 
 
