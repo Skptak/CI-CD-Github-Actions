@@ -1,0 +1,84 @@
+name: 'rust-spell-check'
+description: 'Rust CI spellings check'
+inputs:
+  path:
+    description: 'Path to repository folder to check spellings in.'
+    required: false
+    default: ./
+  lexicon:
+    description: 'Path to lexicon file to check spellings with'
+    required: false
+    default: lexicon.txt
+
+runs:
+  using: "composite"
+  steps:
+    - env:
+        stepName: Install aspell
+      name: ${{ env.stepName }}
+      shell: bash
+      run: |
+        # Install aspell
+        # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        echo "::group::Install aspell"
+        sudo apt-get install aspell libaspell-dev util-linux
+        if [ "$?" = "0" ]; then
+        echo "::endgroup::"
+          echo -e "\033[32;3mInstalled Aspell Succesfully\033[0m"
+        else
+          echo -e "\033[32;31mAspell Installation Failed...\033[0m"
+          exit 1
+        fi
+    
+    - name: Install rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: nightly
+          override: true
+          components: rustfmt, clippy
+
+    - name: Compile Spell checker
+      id: compile-spell-chcker
+      working-directory: .
+      shell: bash
+      run: | 
+        # Compile Spell Checker
+        echo "::group::Compile Spell Checker"
+        PATH=$PATH:/home/runner/.cargo/bin
+        cargo --version
+        echo "GITHUB_ACTION_PATH/rust-spell-check=$GITHUB_ACTION_PATH"
+        ls $GITHUB_ACTION_PATH
+        cd $GITHUB_ACTION_PATH
+        cargo build --release
+        target/release/spell-checker --help
+        exitStatus=$?
+        echo "::endgroup::"
+        if [ "$exitStatus" = "0" ]; then
+          echo -e "\e[0;32mBuilt the spell checker\e[0m"
+        else
+          echo -e "\e[0;32mFailed to build the spell checker\e[0m"
+          # If there is an error, set this flag high again so the exit 1 fails the run
+          set -e
+          exit 1
+        fi
+
+    - name: Run Spell Checker
+      id: run-spell-checker
+      working-directory: ${{ inputs.path }}
+      run: |
+        # Run Spell Checker
+        echo "::group::Run Spell Checker"
+        PATH=$PATH:$GITHUB_ACTION_PATH/target/release
+        find . -iname "*.[ch]"| xargs spell-checker -c -w ${{ inputs.lexicon}}
+        exitStatus=$?
+        echo "::endgroup::"
+        if [ "$exitStatus" = "0" ]; then
+          echo -e "\e[0;32mRan the spell checker\e[0m"
+        else
+          echo -e "\e[0;32mFailed to run the spell checker\e[0m"
+          # If there is an error, set this flag high again so the exit 1 fails the run
+          set -e
+          exit 1
+        fi
+      shell: bash
+

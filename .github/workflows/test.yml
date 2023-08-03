@@ -16,6 +16,178 @@ env:
 
 jobs:
 
+  get-files-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - env:
+          stepName: "Install Dependencies"
+        name: ${{ env.stepName }}
+        shell: bash
+        working-directory: clang-formatting
+        run: |
+          # ${{ env.stepName }}
+          "echo::group::${{ env.stepName }}"
+          sudo apt install fd-find
+          fd-find --version
+          exitStatus=$?
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi       
+ 
+      - env:
+          stepName: "Functional | Success | getFiles() No Arguments"
+        name: ${{ env.stepName }}
+        shell: bash
+        working-directory: clang-formatting
+        run: |
+          # ${{ env.stepName }}
+          "echo::group::${{ env.stepName }}"
+          export PATH="$(readlink -f ../.):$PATH"
+          allFiles=$(grep -sril "copyright.*amazon" --include="*.c" --include="*.h")
+          getFiles
+          exitStatus=0
+          for file in $allFiles ; do
+            if ! [[ $files == *"$file"* ]]; then
+              echo -e "${{ env.bashFail }} Get Files did not find file: $file ${{ env.bashEnd }}"
+              exitStatus=1
+            fi
+          done
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+
+      - env:
+          stepName: "Functional | Success | getFiles() Exclude Single File"
+        name: ${{ env.stepName }}
+        shell: bash
+        working-directory: clang-formatting
+        run: |
+          # ${{ env.stepName }}
+          "echo::group::${{ env.stepName }}"
+          getFiles --exclude-filess="test.c"
+          exitStatus=0
+          if [[ $files == *"test.c"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a file it should have skipped: test.c ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+
+      - env:
+          stepName: "Functional | Success | getFiles() Exclude Single Directory"
+        name: ${{ env.stepName }}
+        shell: bash
+        working-directory: clang-formatting
+        run: |
+          # ${{ env.stepName }}
+          "echo::group::${{ env.stepName }}"
+          getFiles --exclude-dirs="goodFiles"
+          exitStatus=0
+          if [[ $files == *"goodFiles"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+      
+      - env:
+          stepName: "Functional | Success | getFiles() Exclude Single Directory and File"
+        name: ${{ env.stepName }}
+        shell: bash
+        working-directory: clang-formatting
+        run: |
+          # ${{ env.stepName }}
+          "echo::group::${{ env.stepName }}"
+          getFiles --exclude-dirs="goodFiles" --exclude-files="test.c"
+          exitStatus=0
+          if [[ $files == *"test.c"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+
+      - env:
+          stepName: "Functional | Success | getFiles() Include Extra File"
+        name: ${{ env.stepName }}
+        shell: bash
+        working-directory: clang-formatting
+        run: |
+          # ${{ env.stepName }}
+          "echo::group::${{ env.stepName }}"
+          getFiles --include-files="README.md"
+          exitStatus=0
+          if [[ $files != *"README.md"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+      
+      - env:
+          stepName: "Functional | Success | getFiles() Exclude Two Directories and Two Files"
+        name: ${{ env.stepName }}
+        shell: bash
+        working-directory: clang-formatting
+        run: |
+          # ${{ env.stepName }}
+          "echo::group::${{ env.stepName }}"
+          getFiles --exclude-dirs="filesWithCRLFEndings,include" --exclude-files="fileFormattedWithClangFormatV16.c,badFile.c"
+          exitStatus=0
+          if [[ $files == *"fileFormattedWithClangFormatV16.c"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: fileFormattedWithClangFormatV16.c ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [[ $files == *"badFile.c"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: badFile.c ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [[ $files == *"filesWithCRLFEndings"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: filesWithCRLFEndings ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          if [[ $files == *"include"* ]]; then
+            echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: include ${{ env.bashEnd }}"
+            exitStatus=1
+          fi
+          echo "::endgroup::"
+          if [ "$exitStatus" = "0" ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+
   uncrustify-formatting-success-cases:
       runs-on: ubuntu-20.04
       steps:
