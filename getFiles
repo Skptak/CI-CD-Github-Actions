@@ -73,27 +73,27 @@ fi
 
 
     # Command for fd
-if [ command -v fd &> /dev/null ]; then
-    # Use regex to match the pattern
-   # echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
-    # Exclude any files we were asked to
-    # Then perform a grep for the amazon copyright in found files
-   # echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
-    export files=($(fd --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" \
-                --exec grep $grepArgs "copyright (.*) 20\d\d amazon.com" ))
-
-    # Command for fdfind
-elif [ command -v fdfind &> /dev/null ]; then
-    # Use regex to match the pattern
-    #echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
-    # Exclude any files we were asked to
-    # Then perform a grep for the amazon copyright in found files
-    #echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
-    fdfind --regex "$regexPattern" --exec grep "$grepArgs"
-    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs"
-    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs" --exclude "{$excludeDirs}"
-    export files=($(fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" --exec grep "$grepArgs" ))
-
+#if [ command -v fd &> /dev/null ]; then
+#    # Use regex to match the pattern
+#   # echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
+#    # Exclude any files we were asked to
+#    # Then perform a grep for the amazon copyright in found files
+#   # echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
+#    export files=($(fd --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" \
+#                --exec grep $grepArgs "copyright (.*) 20\d\d amazon.com" ))
+#
+#    # Command for fdfind
+#elif [ command -v fdfind &> /dev/null ]; then
+#    # Use regex to match the pattern
+#    #echo -e "$bashInfo Looking for Files Using Regex: $regexPattern $bashEnd"
+#    # Exclude any files we were asked to
+#    # Then perform a grep for the amazon copyright in found files
+#    #echo -e "$bashInfo $fdCmd --regex \"$regexPattern\" --exclude \"{$excludeFiles}\" --exclude \"{$excludeDirs}\" -exec grep $grepArgs $bashEnd"
+#    fdfind --regex "$regexPattern" --exec grep "$grepArgs"
+#    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs"
+#    fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exec grep "$grepArgs" --exclude "{$excludeDirs}"
+#    export files=($(fdfind --regex "$regexPattern" --exclude "{$excludeFiles}" --exclude "{$excludeDirs}" --exec grep "$grepArgs" ))
+#
 
 # Adding both OS's here to make it work for local testing on Mac
 # So this grep grabs all .c and .h files that have the amazon copyright
