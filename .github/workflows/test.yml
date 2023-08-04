@@ -491,6 +491,10 @@ jobs:
         with:
           path: formatting
 
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
+
       - env:
           stepName: "Functional | Failure | CRLF and Formatting Error"
         name: ${{ env.stepName }}
@@ -501,6 +505,10 @@ jobs:
           path: formatting
           exclude-dirs: "filesWithTrailingWhitespace"
 
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
+
       - env:
           stepName: "Functional | Failure | CRLF and Whitespace Error"
         name: ${{ env.stepName }}
@@ -510,6 +518,10 @@ jobs:
         with:
           path: formatting
           exclude-dirs: "filesWithFormattingErrors"
+
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
 
       - env:
           stepName: "Functional | Failure | CRLF Error"
@@ -522,6 +534,10 @@ jobs:
           exclude-dirs: "filesWithFormattingErrors,filesWithTrailingWhitespace"
           exclude-files: "badFile.c"
 
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
+  
       - env:
           stepName: "Functional | Failure | Formatting and Whitespace Errror"
         name: ${{ env.stepName }}
@@ -532,6 +548,10 @@ jobs:
           path: formatting
           exclude-dirs: "filesWithCRLFEndings"
 
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
+  
       - env:
           stepName: "Functional | Failure | Formatting Errror"
         name: ${{ env.stepName }}
@@ -541,6 +561,10 @@ jobs:
         with:
           path: formatting
           exclude-dirs: "filesWithTrailingWhitespace,filesWithCRLFEndings"
+
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
 
       - env:
           stepName: "Functional | Failure | Whitespace Errror"
@@ -552,6 +576,10 @@ jobs:
           path: formatting
           exclude-dirs: "filesWithFormattingErrrors,filesWithCRLFEndings"
 
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
+
       - env:
           stepName: "API | Failure | Exclude Dirs Error"
         name: ${{ env.stepName }}
@@ -562,6 +590,10 @@ jobs:
           path: formatting
           exclude-dirs: "filesWithFormattingErrrors,    filesWithCRLFEndings"
 
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
+
       - env:
           stepName: "API | Failure | Exclude Files Error"
         name: ${{ env.stepName }}
@@ -571,6 +603,10 @@ jobs:
         with:
           path: formatting
           exclude-files: "filesWithFormattingErrrors,    filesWithCRLFEndings"
+
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
 
       - env:
           stepName: "API | Failure | Exclude Option Errors"
@@ -584,6 +620,10 @@ jobs:
           exclude-dirs: "filesWithFormattingErrrors,
                           filesWithCRLFEndings"
 
+      - name:  Reset Files
+        shell: bash
+        run: git reset --hard
+                  
       - env:
           stepName: Check Failure Test Cases
         name: ${{ env.stepName }}

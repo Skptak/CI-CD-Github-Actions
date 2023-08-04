@@ -30,18 +30,16 @@ runs:
           echo "::group::${{ env.stepName }}"
           sudo apt-get install clang-format fd-find
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-          
+
           fdfind --version
           fdInstalled=$?
 
           clang-format --version
           clangFormatInstalled=$?
 
-          ls
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           getFiles --help
           getFilesAdded=$?
-          echo -e "getFilesAdded=$getFilesAdded"
 
           echo "::endgroup::"
           if [ $getFilesAdded -eq 1 ] || [ $clangFormatInstalled -eq 1] || [ $fdInstalled -eq 1 ]; then
@@ -114,8 +112,8 @@ runs:
 
           echo "::group::File Difference"
           git diff --exit-code
-          echo "::endgroup::"
           exitCode=$?
+          echo "::endgroup::"
           if [ $exitCode -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
@@ -125,65 +123,4 @@ runs:
             # If there is an error, set this flag high again so the exit 1 fails the run instantly
             set -e
             exit 1
-          fi
-
-      - env:
-          stepName: Check For Trailing Whitespace
-        name: ${{ env.stepName }}
-        shell: bash
-        # Use this so that even if we fail formatting these checks run
-        # Solves the issue of "Make commit to fix formatting, to then learn
-        # You need to fix whitespace
-        if: success() || failure() && ${{ steps.validate-inputs.outcome}} = "success"
-        working-directory: ${{ inputs.path }}
-        run: |
-          # ${{ env.stepName }}
-          echo "::group::${{ env.stepName }}"
-          export PATH="$PATH:$GITHUB_ACTION_PATH"
-          files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
-          set +e
-          exitStatus=0
-          for file in ${files[@]}; do
-            fileOut=$(grep -nIe "[[:blank:]]$" "$file")
-            if [ $? -eq 0 ]; then
-              echo "${{ env.bashFail }} "$fileOut" ${{ env.bashEnd }}"
-              exitStatus=1;
-            fi
-          done
-          set -e
-          echo "::endgroup::"
-          if [ $exitStatus -eq 1 ]; then
-            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 1
-          else
-            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 0
-          fi
-
-      - env:
-          stepName: Check for CRLF
-        name: ${{ env.stepName }}
-        if: success() || failure() && ${{ steps.validate-inputs.outcome}} = "success"
-        working-directory: ${{ inputs.path }}
-        shell: bash
-        run: |
-          # ${{ env.stepName }}
-          export PATH="$PATH:$GITHUB_ACTION_PATH"
-          files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
-          exitStatus=0
-          set +e
-          for file in ${files[@]}; do
-            fileOut=$(grep -nl $'\r' "$file")
-            if [ $? -eq 0 ]; then
-              echo "${{ env.bashFail }} "$fileOut" ${{ env.bashEnd }}"
-              exitStatus=1;
-            fi
-          done
-          set -e
-          if [ $exitStatus -eq 1 ]; then
-            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 1
-          else
-            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 0
           fi
