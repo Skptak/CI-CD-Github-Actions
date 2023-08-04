@@ -37,12 +37,6 @@ runs:
           clang-format --version
           clangFormatInstalled=$?
 
-          set +e
-          echo -e "GITHUB_ACTION_PATH= $GITHUB_ACTION_PATH"
-          echo -e "ls GITHUB_ACTION_PATH = $(ls $GITHUB_ACTION_PATH)"
-          echo -e "pwd= $(pwd)";
-          echo "PATH=$PATH"
-          set -e
           ls
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           getFiles --help
@@ -147,6 +141,7 @@ runs:
           echo "::group::${{ env.stepName }}"
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
+          set +e
           exitStatus=0
           for file in ${files[@]}; do
             fileOut=$(grep -nIe "[[:blank:]]$" "$file")
@@ -155,9 +150,9 @@ runs:
               exitStatus=1;
             fi
           done
-
+          set -e
           echo "::endgroup::"
-          if [ $exitStatus -eq 0 ]; then
+          if [ $exitStatus -eq 1 ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 1
           else
@@ -176,6 +171,7 @@ runs:
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
           exitStatus=0
+          set +e
           for file in ${files[@]}; do
             fileOut=$(grep -nl $'\r' "$file")
             if [ $? -eq 0 ]; then
@@ -183,7 +179,8 @@ runs:
               exitStatus=1;
             fi
           done
-          if [ $exitStatus -eq 0 ]; then
+          set -e
+          if [ $exitStatus -eq 1 ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 1
           else
