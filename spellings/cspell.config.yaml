@@ -15,7 +15,8 @@ dictionaries:
   - freertos-words
 ignorePaths:
   - 'node_modules'
-  - '/freeRTOS-words.txt'
+  - '.cSpellWords.txt'
   - 'dependency'
   - 'docs'
   - 'ThirdParty'
+

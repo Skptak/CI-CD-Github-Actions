@@ -29,11 +29,15 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
+          # Add the helper scripts to the path of all future steps
+          echo "$(readlink -f ../helpers)" >> $GITHUB_PATH
+          
           sudo apt install fd-find
           fdfind --version
+          
           exitStatus=$?
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -48,8 +52,6 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          export PATH="$(readlink -f ../.):$PATH"
-          export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           allFiles=$(grep -sril "copyright.*amazon" --include="*.c" --include="*.h")
           files=$(getFiles)
           echo -e "${{ env.bashInfo }} allFiles:\n$allFiles ${{ env.bashEnd }}"
@@ -65,7 +67,7 @@ jobs:
             fi
           done
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -80,8 +82,6 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          export PATH="$(readlink -f ../.):$PATH"
-          export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="test.c")
           echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashEnd }}"
           exitStatus=0
@@ -93,7 +93,7 @@ jobs:
             exitStatus=1
           fi
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -108,8 +108,6 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          export PATH="$(readlink -f ../.):$PATH"
-          export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-dirs="goodFiles")
           echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashEnd }}"
           exitStatus=0
@@ -118,7 +116,7 @@ jobs:
             exitStatus=1
           fi
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -133,8 +131,6 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          export PATH="$(readlink -f ../.):$PATH"
-          export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-dirs="goodFiles" --exclude-files="test.c")
           echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashInfo }}"
           exitStatus=0
@@ -143,7 +139,7 @@ jobs:
             exitStatus=1
           fi
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -151,24 +147,25 @@ jobs:
           fi
 
       - env:
-          stepName: "Functional | Success | getFiles() Include Extra File"
+          stepName: "Functional | Success | getFiles() Include Extra Type"
         name: ${{ env.stepName }}
         shell: bash
         working-directory: formatting
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          export PATH="$(readlink -f ../.):$PATH"
-          export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
-          files=$(getFiles --include-files="README.md")
+
+          files=$(getFiles --include-extensions="md")
           echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashEnd }}"
+          
           exitStatus=0
           if [[ "$files" != *"README.md"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
             exitStatus=1
           fi
+          
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -183,29 +180,33 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          export PATH="$(readlink -f ../.):$PATH"
-          export GITHUB_ACTION_PATH="$(readlink -f ../.):$GITHUB_ACTION_PATH"
+          files=""
           files=$(getFiles --exclude-dirs="filesWithCRLFEndings,include" --exclude-files="fileFormattedWithClangFormatV16.c,badFile.c")
-          echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashEnd }}"
+
+          echo -e "${{ env.bashInfo }} files:\n"$files" ${{ env.bashEnd }}"
           exitStatus=0
           if [[ "$files" == *"fileFormattedWithClangFormatV16.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: fileFormattedWithClangFormatV16.c ${{ env.bashEnd }}"
             exitStatus=1
           fi
+          
           if [[ "$files" == *"badFile.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: badFile.c ${{ env.bashEnd }}"
             exitStatus=1
           fi
+          
           if [[ "$files" == *"filesWithCRLFEndings"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: filesWithCRLFEndings ${{ env.bashEnd }}"
             exitStatus=1
           fi
+          
           if [[ "$files" == *"include"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: include ${{ env.bashEnd }}"
             exitStatus=1
           fi
+          
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -681,7 +682,7 @@ jobs:
           sudo apt install build-essential
           exitStatus=$?
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -702,7 +703,7 @@ jobs:
           readlink -f executable-monitor/test_exit_current_minutes.out
           exitStatus=$?
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -841,7 +842,7 @@ jobs:
         sudo apt install build-essential
         exitStatus=$?
         echo "::endgroup::"
-        if [ "$exitStatus" = "0" ]; then
+        if [ $exitStatus -eq 0 ]; then
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
         else
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -862,7 +863,7 @@ jobs:
         readlink -f executable-monitor/test_exit_current_minutes.out
         exitStatus=$?
         echo "::endgroup::"
-        if [ "$exitStatus" = "0" ]; then
+        if [ $exitStatus -eq 0 ]; then
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
         else
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -1043,6 +1044,7 @@ jobs:
           path: coreMQTT
           # For coreMQTT the code complexity threshold is 10.
           horrid_threshold: 10
+
   test-doxygen-zip-check:
     runs-on: ubuntu-latest
     steps:
@@ -1062,6 +1064,7 @@ jobs:
           path: ./aws-iot-device-sdk-embedded-C
           libs_parent_dir_path: libraries/standard,libraries/aws
           generate_zip: true
+
   test-doxygen-non-zip-check:
     runs-on: ubuntu-latest
     steps:
@@ -1075,19 +1078,21 @@ jobs:
         uses: ./doxygen
         with:
           path: coreMQTT
+
   test-spell-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/checkout@v3
         with:
-          repository: FreeRTOS/coreMQTT
+          repository: skptak/coreMQTT
           ref: main
           path: coreMQTT
       - name: Test spell check action
         uses: ./spellings
         with:
           path: coreMQTT
+
   test-coverage-cop:
     runs-on: ubuntu-latest
     steps:
@@ -1123,6 +1128,7 @@ jobs:
           path: ./build/coverage.info
           branch-coverage-min: 70
           line-coverage-min: 100
+
   test-memory-statistics:
     runs-on: ubuntu-latest
     steps:
@@ -1134,6 +1140,7 @@ jobs:
           config: ./memory_statistics_config.json
           output: ./size_table_new.html
           check_against: ./size_table_expected.html
+
   test-link-verifier:
     runs-on: ubuntu-latest
     steps:
@@ -1148,6 +1155,7 @@ jobs:
           path: ./
           exclude-dirs: complexity,formatting
           include-file-types: .c,.html
+
   test-manifest-verifier:
     runs-on: ubuntu-latest
     steps:

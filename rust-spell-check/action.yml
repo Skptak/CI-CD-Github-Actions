@@ -15,7 +15,7 @@ inputs:
   exclude-files:
     description: "Comma separated list of files to not spell check"
     required: false
-  include-files:
+  include-extensions:
     description: "Comma separated list of files to match to regex"
     required: false
 
@@ -39,7 +39,7 @@ runs:
         sudo apt-get install aspell libaspell-dev util-linux
         exitStatus=$?
         echo "::endgroup::"
-        if [ "$exitStatus" = "0" ]; then
+        if [ $exitStatus -eq 0 ]; then
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
         else
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -62,13 +62,13 @@ runs:
       run: | 
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
-        PATH=$PATH:/home/runner/.cargo/bin
+        echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
         cargo --version
         cargo build --release
         target/release/spell-checker --help
         exitStatus=$?
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -84,13 +84,13 @@ runs:
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
-        PATH=$PATH:$GITHUB_ACTION_PATH/target/release
-        PATH=$PATH:$GITHUB_ACTION_PATH/../
-        getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-files="${{ inputs.include-files }}
+        
+        getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}
         spell-checker -c -w ${{ inputs.lexicon}}
         exitStatus=$?
+
         echo "::endgroup::"
-        if [ "$exitStatus" = "0" ]; then
+        if [ $exitStatus -eq 0 ]; then
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
         else
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"

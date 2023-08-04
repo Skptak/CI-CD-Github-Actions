@@ -37,9 +37,9 @@ typedef struct DateAndTime
 
         gettimeofday( &tv, NULL );
         tm = localtime( &tv.tv_sec );
-        currentTime->hour = tm->tm_hour;   
+        currentTime->hour = tm->tm_hour;
         currentTime->minutes = tm->tm_min;
-        currentTime->seconds = tm->tm_sec;  
+        currentTime->seconds = tm->tm_sec;
         currentTime->msec = ( int ) ( tv.tv_usec / 1000 );
     }
 #endif /* if defined( WIN32 ) || defined( _WIN32 ) || defined( __WIN32__ ) || defined( __NT__ ) || defined( WIN64 ) || defined( __WIN64 ) */
@@ -50,12 +50,12 @@ int main( int argc,
     DateAndTime currentTime = { 0 };
     int32_t loop = 0;
     int32_t totalLoops = 5U;
-    int32_t exitCode = 0;  
+    int32_t exitCode = 0;
 
     if( argc == 1 )
     {
-        printf( "This is a basic test application         .\n");  
-        printf( "It prints the date and time and then sleeps for loopCount * 3\n" );  
+        printf( "This is a basic test application         .\n");
+        printf( "It prints the date and time and then sleeps for loopCount * 3\n" );
         printf( "This program takes in two inputs, a loop count and an exit code\n" );
         printf( "By default it will run %d loops and exit with exit status %d\n", totalLoops, exitCode );
     }
@@ -66,28 +66,28 @@ int main( int argc,
         printf( "Will run for requested %d loops\n",    totalLoops );
     }
 
-    if( argc == 3 )  
+    if( argc == 3 )
     {
         exitCode = atoi( argv[ 2 ] );
         printf( "Will exit with supplied exit code %d\n",              exitCode );
     }
 
-    setvbuf( stdout, NULL, _IONBF, 0 );
+    setvbuf(         stdout, NULL, _IONBF, 0 );
 
-    for( int i = 1U; i < totalLoops; i++ )
+    for(int i = 1U; i < totalLoops; i++ )
     {
         getTime( &currentTime );
         printf( "%02llu:%02llu:%02llu.%03llu TEST APPLICATION SLEEPING FOR %d SECONDS\n",
                 currentTime.hour,
-                currentTime.minutes         ,         
+                currentTime.minutes         ,
                 currentTime.seconds,
-                currentTime.msec,  
+                currentTime.msec,
                 i * 3U );
         sleep( i * 3U );
     }
 
     #ifdef EXIT_WITH_MINUTES
-        exitCode = currentTime.minutes;
+                        exitCode = currentTime.minutes;
     #endif
     printf( "EXITING TEST APPLICATION WITH EXIT CODE = %d\n"
 , exitCode );

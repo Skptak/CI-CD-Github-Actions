@@ -28,21 +28,35 @@ inputs:
 runs:
   using: "composite"
   steps: 
-      - name: Install Dependencies
+      - env:
+          # The bash escape character is \033
+          # At time of writing, you can't add a global environment to an
+          # action so stuck with this. If this gets changed please move this
+          bashPass:   \033[32;1mPASSED -
+          bashInfo:   \033[33;1mINFO -
+          bashFail:   \033[31;1mFAILED -
+          bashEnd:     ${{ env.bashEnd }}
+          stepName: Install Dependencies
+        name: ${{ env.stepName }}
+        shell: bash
         run: |
-          # Install Dependencies
+          # ${{ env.stepName }}
           echo "::group::Install Dependencies"
           pip install -r $GITHUB_ACTION_PATH/requirements.txt
+          exitStatus=$?
           echo "::endgroup::"
-          if [ "$?" = "0" ]; then
-            echo -e "\033[32;3mInstalled all dependencies\033[0m"
-            exit 0
-          else
-            echo -e "\033[32;31mDependencies Install failed...\033[0m"
+          if [ $exitStatus -eq 1 ]; then
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            set -e
             exit 1
+          else
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 0
           fi
+        
+      - env:
+          stepName: ${{ env.stepName }}
         shell: bash
-      - name: Run Executable with Monitoring
         run: |
           # Run Executable with Monitoring
           echo "::group::Argument Parsing"
@@ -50,7 +64,7 @@ runs:
           # Make sure we have an exit condition to look for
           if [ "${{ inputs.success-exit-code }}" = "" ] && [ "${{ inputs.success-line }}" = "" ]; then
             echo "::endgroup::"
-            echo -e "\033[32;31mDid not supply an input of success-line or success-exit-code to search for\033[0m"
+            echo -e "${{ env.bashFail}}Did not supply an input of success-line or success-exit-code to search for ${{ env.bashEnd }}"
             exit 1
           fi
 
@@ -84,12 +98,12 @@ runs:
             successLineArgs="--success-line=\"${{ inputs.success-line}}\" $optArgs"
             echo "Adding --success-line=${{ inputs.success-line}}"
             echo "::endgroup::"
-            echo -e "\033[1;33mRunning Command: python3 executable-monitor.py --exe-path=${{ inputs.exe-path }} --timeout-seconds=${{ inputs.timeout-seconds }} --success-line="${{ inputs.success-line }}" $optArgs  \033[0m"
+            echo -e " ${{ env.bashInfo }}Running Command: python3 executable-monitor.py --exe-path=${{ inputs.exe-path }} --timeout-seconds=${{ inputs.timeout-seconds }} --success-line="${{ inputs.success-line }}" $optArgs ${{ env.bashEnd }}"
             echo "::group::Executable Output"
             python3 $GITHUB_ACTION_PATH/executable-monitor.py --exe-path=${{ inputs.exe-path }} --timeout-seconds=${{ inputs.timeout-seconds }} $optArgs --success-line="${{ inputs.success-line}}"
           else
             echo "::endgroup::"
-            echo -e "\033[1;33mRunning Command: python3 executable-monitor.py --exe-path=${{ inputs.exe-path }} --timeout-seconds=${{ inputs.timeout-seconds }} $optArgs \033[0m"
+            echo -e " ${{ env.bashInfo }}Running Command: python3 executable-monitor.py --exe-path=${{ inputs.exe-path }} --timeout-seconds=${{ inputs.timeout-seconds }} $optArgs ${{ env.bashEnd }}"
             echo "::group::Executable Output"
             python3 $GITHUB_ACTION_PATH/executable-monitor.py --exe-path=${{ inputs.exe-path }} --timeout-seconds=${{ inputs.timeout-seconds }} $optArgs
           fi
@@ -97,11 +111,10 @@ runs:
           exitStatus=$?
           echo "::endgroup::"
           if [ "$exitStatus" = "0" ]; then
-            echo -e "\033[32;3mValid exit status found\033[0m"
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 0
           else
-            echo -e "\033[32;31mDid not find a valid exit condition\033[0m"
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             set -e
             exit 1
           fi
-        shell: bash

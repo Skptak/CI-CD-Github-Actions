@@ -13,8 +13,8 @@ inputs:
     description: 'List of comma-separated directories to exclude from trailing whitespace formatting check. Eg docs,build'
     required: false
     default: ''
-  include-files:
-    description: 'List of comma-separated files to include into the spell check. Eg docs,build'
+  include-extensions:
+    description: 'List of comma-separated file endings to include into the spell check. Eg md, dox, build'
     required: false
     default: ''
 
@@ -23,7 +23,12 @@ runs:
   steps:
       - env:
           stepName: Install Spell
+          bashPass:   \033[32;1mPASSED -
+          bashInfo:   \033[33;1mINFO -
+          bashFail:   \033[31;1mFAILED -
+          bashEnd:    \033[0m
         name: ${{ env.stepName }}
+        shell: bash
         run: |
           #  ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
@@ -31,13 +36,19 @@ runs:
           sudo apt-get install util-linux
           sudo apt-get install npm
           npm install -g cspell
+          echo "$GITHUB_ACTION_PATH/../helpers" >> $GITHUB_PATH
+          cspell --version
+          exitStatus=$?
+          set -e
           echo "::endgroup::"
-        shell: bash
+          if [ $exitStatus -eq 0 ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          fi
+
       - env:
-          bashPass:   \033[32;1mPASSED -
-          bashInfo:   \033[33;1mINFO -
-          bashFail:   \033[31;1mFAILED -
-          bashEnd:    \033[0m
           stepName: Check Spelling
         name: ${{ env.stepName}}
         shell: bash
@@ -46,25 +57,12 @@ runs:
           #  ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
           set +e
-          pwd
-          ls $GITHUB_ACTION_PATH
-          readlink -f "$GITHUB_ACTION_PATH"/../.
-          export PATH=$(readlink -f "$GITHUB_ACTION_PATH"/../.):$PATH
-          file=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files=${{ inputs.exclude-files }} --include-files= ${{ inputs.include-files}})
-          #files=($(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" ))
-          for file in ${files[@]}; do
-            echo -e "${{ env.bashInfo }} Checking Spelling of: "$file" ${{ env.bashEnd }}"
-            # Call cspell with the C language option. 
-            # Enable colour output
-            # Use the config file in the repository calling it
-            # Show suggestions for correct spellings
-            # Check Spelling of words in file
-            cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context $file
-          done
+          files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files=${{ inputs.exclude-files }} --include-extensions=${{ inputs.include-extensions}})
+          cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context --file-list "$file"
           exitStatus=$?
           set -e
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"

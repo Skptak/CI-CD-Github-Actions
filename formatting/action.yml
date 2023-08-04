@@ -6,13 +6,18 @@ inputs:
     required: false
     default: ./
   exclude-files:
-    description: 'List of comma-separated files to exclude from trailing whitespace check. Eg file1,file2'
+    description: 'List of comma-separated files to exclude from the formatting check. Eg file1,file2'
     required: false
     default: ''
   exclude-dirs:
-    description: 'List of comma-separated directories to exclude from trailing whitespace formatting check. Eg docs,build'
+    description: 'List of comma-separated directories to exclude from the formatting check. Eg docs,build'
     required: false
     default: ''
+  include-extensions:
+    description: 'List of comma-separated extensions to add to the formatting check . Eg md,dox'
+    required: false
+    default: ''
+
 runs:
   using: "composite"
   steps:
@@ -23,8 +28,44 @@ runs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          sudo apt-get install clang-format
+          sudo apt-get install clang-format fd-find
+          ls $GITHUB_ACTION_PATH/../helpers
+          echo -e "$GITHUB_ACTION_PATH/../helpers" >> $GITHUB_PATH
+          export GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH/../helpers
+
+          fdfind --version
+          fdInstalled=$?
+
+          clang-format --version
+          clangFormatInstalled=$?
+
+          set +e
+          echo -e "getFilesAdded= $getFilesAdded"
+          echo -e "GITHUB_ACTION_PATH= $GITHUB_ACTION_PATH"
+          echo -e "ls GITHUB_ACTION_PATH = $(ls $GITHUB_ACTION_PATH)"
+          echo -e "ls GITHUB_ACTION_PATH/.. = $(ls $GITHUB_ACTION_PATH/..)"
+          echo -e "pwd= $(pwd)";
+          echo -e "ls (pwd)/../= $(ls $(pwd)/../)";
+          echo -e "ls $(pwd)/../helpers= $(ls $(pwd)/../helpers)";
+          echo -e "$(pwd)/../helpers" >> $GITHUB_PATH
+          echo "$(readlink -f ../helpers)" >> $GITHUB_PATH
+          echo "PATH=$PATH"
+          export PATH="$(pwd)/../helpers"
+          echo "PATH=$PATH"
+          set -e
+
+          getFiles --help
+          getFilesAdded=$?
+          echo -e "getFilesAdded=$getFilesAdded"
+
           echo "::endgroup::"
+          if [ $getFilesAdded -eq 1 ] || [ $clangFormatInstalled -eq 1] || [ $fdInstalled -eq 1 ]; then
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 1
+          else
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+            exit 0
+          fi
 
       - env:
           stepName: Validate Inputs
@@ -41,21 +82,11 @@ runs:
         shell: bash
         run: |
           # ${{ env.stepName }}
-          set +e
-          exitStatus=0
           # Check exclude dirs for possible input issues
-          if [[ "${{ inputs.exclude-dirs }}" = *" "* ]]; then
-            echo -e "${{ env.bashFail }} YOU HAVE WHITESPACE IN YOUR EXCLUDE-DIRS. ${{ env.bashEnd }}"
+          if [[ "${{ inputs.exclude-dirs }}" = *"\n"* ]]; then
+            echo -e "${{ env.bashFail }} YOU HAVE NEWLINE IN YOUR EXCLUDE-DIRS. ${{ env.bashEnd }}"
             exitStatus=1
           fi
-
-          # Check exclude-files  for possible input issues
-          if [[ "${{ inputs.exclude-files }}" = *" "* ]]; then
-            echo -e "${{ env.bashFail }} YOU HAVE WHITESPACE IN YOUR EXCLUDE-FILES. ${{ env.bashEnd }}"
-            exitStatus=1
-          fi
-          set -e
-          exit $exitStatus
 
       - env:
           stepName: Run Clang Format
@@ -72,13 +103,11 @@ runs:
           # This would mean the first time a file fails the check that we exit without formatting all files.
           set +e
 
-          # Get all files that end in .c or .h.
-          # Exclude any files or directories that we were asked to.
-          # Then limit the search to files that have the amazon copyright on them.
-          # -l Provides a list of the files
-          # -r Means do a recursive search
-          # -i tells it to ignore the case
-          files=$(grep --include={*.[ch],} --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},} -lriE "copyright (.*) [0-9]{4} amazon.com" )
+          files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
+          if [ ! $? -eq 0 ]; then
+              echo -e "${{ env.bashFail }} Error calling getFiles() ${{ env.bashEnd }}"
+              echo -e "$fileOut"
+          fi
 
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
@@ -89,23 +118,24 @@ runs:
             # This way we can print the command only if it fails
             fileOut=$(clang-format -i --verbose --style=file $file)
             # If the previous command failed then print out an error message as well as the output
-            if [ "$?" != "0" ]; then
+            if [ ! $? -eq 0 ]; then
               echo -e "${{ env.bashFail }} Error parsing "$file" ${{ env.bashEnd }}"
               echo -e "$fileOut"
             fi
           done
+
           echo "::endgroup::"
           # Run a git diff to print the differences if any exist, return an error code if there are any
+
           echo "::group::File Difference"
           git diff --exit-code
-          exitCode=$?
           echo "::endgroup::"
-          if [ "$exitCode" = "0" ]; then
+          exitCode=$?
+          if [ $exitCode -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
-            filesWithErrors=$(git diff --name-only)
             echo -e "${{ env.bashFail }} List of files with formatting errors: ${{ env.bashEnd }}"
-            echo -e "${{ env.bashFail }} "$filesWithErrors" ${{ env.bashEnd }} "
+            echo -e "${{ env.bashFail }} "$(git diff --name-only)" ${{ env.bashEnd }} "
             echo -e "${{ env.bashFail }} ${{env.stepName }} ${{ env.bashEnd }}"
             # If there is an error, set this flag high again so the exit 1 fails the run instantly
             set -e
@@ -123,9 +153,21 @@ runs:
         working-directory: ${{ inputs.path }}
         run: |
           # ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
+
           set +e
-          grep --exclude={README.md,${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},.git} -rnIe "[[:blank:]]$" .
-          if [ "$?" = "0" ]; then
+          files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
+
+          for file in ${files[@]}; do
+            grep -nIe "[[:blank:]]$" "$file" > $fileOut
+            if [ $? -eq 0 ]; then
+              echo "${{ env.bashFail }} "$fileOut" ${{ env.bashEnd }}"
+              exitStatus=1;
+            fi
+          done
+
+          echo "::endgroup::"
+          if [ $exitStatus -eq 1 ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             set -e
             exit 1
@@ -143,8 +185,16 @@ runs:
         run: |
           # ${{ env.stepName }}
           set +e
-          grep --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},.git} -rnl $'\r'
-          if [ "$?" = "0" ]; then
+
+          files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
+          for file in ${files[@]}; do
+            grep -nl $'\r' "$file" > $fileOut
+            if [ $? -eq 0 ]; then
+              echo "${{ env.bashFail }} "$fileOut" ${{ env.bashEnd }}"
+              exitStatus=1;
+            fi
+          done
+          if [ $exitStatus -eq 1 ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             set -e
             exit 1
