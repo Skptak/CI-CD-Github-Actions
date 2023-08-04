@@ -41,6 +41,7 @@ runs:
           pwd
           ls -al
           which getFiles
+          fdfind
           cspell --version
           exitStatus=$?
           echo "::endgroup::"
@@ -62,7 +63,7 @@ runs:
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions}}")
           set +e
-          cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context --file-list "$file"
+          cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context --file-list "$files"
           exitStatus=$?
           set -e
           echo "::endgroup::"
