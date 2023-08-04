@@ -15,7 +15,7 @@ inputs:
     default: 8
 runs:
   using: "composite"
-  steps: 
+  steps:
       - name: Setup
         run: sudo apt-get install complexity
         shell: bash

@@ -84,12 +84,14 @@ runs:
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
           # This would mean the first time a file fails the check that we exit without formatting all files.
-          set +e
+
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
           if [ ! $? -eq 0 ]; then
               echo -e "${{ env.bashFail }} Error calling getFiles() ${{ env.bashEnd }}"
               echo -e "$fileOut"
+              set -e
+              exit 1
           fi
 
           # Loop over the files that matched the above conditions
@@ -104,6 +106,7 @@ runs:
             if [ ! $? -eq 0 ]; then
               echo -e "${{ env.bashFail }} Error parsing "$file" ${{ env.bashEnd }}"
               echo -e "$fileOut"
+              clangError=1
             fi
           done
 
@@ -114,6 +117,11 @@ runs:
           git diff --exit-code
           exitCode=$?
           echo "::endgroup::"
+          set -e
+          if [ $clangError -eq 1 ]; then
+            echo -e "${{ env.bashFail }} Clang Encountered an Error ${{ env.bashEnd }}
+          fi
+
           if [ $exitCode -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
           else
@@ -121,6 +129,5 @@ runs:
             echo -e "${{ env.bashFail }} "$(git diff --name-only)" ${{ env.bashEnd }} "
             echo -e "${{ env.bashFail }} ${{env.stepName }} ${{ env.bashEnd }}"
             # If there is an error, set this flag high again so the exit 1 fails the run instantly
-            set -e
-            exit 1
           fi
+          exit $exitCode || $clangError

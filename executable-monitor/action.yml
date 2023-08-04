@@ -27,7 +27,7 @@ inputs:
 
 runs:
   using: "composite"
-  steps: 
+  steps:
       - env:
           # The bash escape character is \033
           # At time of writing, you can't add a global environment to an
@@ -53,7 +53,7 @@ runs:
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 0
           fi
-        
+       
       - env:
           stepName: ${{ env.stepName }}
         shell: bash

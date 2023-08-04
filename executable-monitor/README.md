@@ -17,7 +17,7 @@ By setting the exit code or success line to be a time in the future a test can b
 By setting the success-line to be a time in the future the program will need to "retry" until this time occurs
 By setting the exit code of the program to be the current minute, the program will need to "retry" until this exit code is seen.
 ```gcc test.c -DEXIT_WITH_MINUTES -o test.out```
- 
+
 
 # How to call the program locally with some basic tests.
  Success Test | Test the case where the success line is found but the exe does not exit, ensure exit status is 0

@@ -95,7 +95,7 @@ def runAndMonitor(args):
         if cur_time_seconds >= timeout_time_seconds:
             logging.info(f"TIMEOUT OF {args.timeout_seconds} SECONDS HIT")
             exit_condition_met = True
-        
+
         # Sleep for a short duration between loops to not steal all system resources
         # time.sleep(.05)
 
@@ -124,7 +124,7 @@ def runAndMonitor(args):
     elif( args.success_line is not None) and ( success_line_found ):
         exit_status = 0
         logging.info(f"Success Line: Success line was output")
-    
+
     # Check if a exit code was found if that was an option
     if ( ( exit_status != 0 ) and ( args.success_exit_code is not None) ):
         # If the executable had to be force killed mark it as a failure
@@ -206,28 +206,28 @@ if __name__ == '__main__':
 
     logging.info(f"Running executable: {exe_abs_path} ")
     logging.info(f"Timeout (seconds) per run: {args.timeout_seconds}")
-    
+
     if not args.retry_attempts:
         args.retry_attempts = 0
     else:
         logging.info(f"Will relaunch the executable {args.retry_attempts} times to look for a valid success metric")
-    
+
     if args.success_line is not None:
         logging.info(f"Searching for success line: {args.success_line}")
     if args.success_exit_code is not None:
         logging.info(f"Searching for exit code: {args.success_exit_code}")
-    
+
     # Small increase on the timeout to allow the thread to try and timeout
     threadTimeout = ( args.timeout_seconds + 3 )
     for attempts in range(0,args.retry_attempts + 1):
         exit_status = 1
-        # Set the timeout for the thread    
+        # Set the timeout for the thread
         thread = Process(target=runAndMonitor, args=(args,))
         thread.start()
-        # Wait for the thread to join, or hit a timeout. 
+        # Wait for the thread to join, or hit a timeout.
         thread.join(timeout=threadTimeout)
         # As join() always returns None, you must call is_alive() after join() to decide whether a timeout happened
-        # If the thread is still alive, the join() call timed out.       
+        # If the thread is still alive, the join() call timed out.
         if ( ( thread.exitcode is None ) and ( thread.is_alive() ) ):
             # Print the thread timeout they passed in to the log
             logging.warning(f"{bashWarn}EXECUTABLE HAS HIT TIMEOUT OF {threadTimeout - 3} SECONDS: FORCE KILLING THREAD")

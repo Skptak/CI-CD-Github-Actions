@@ -44,8 +44,8 @@ runs:
         else
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
           exit 1
-        fi       
-    
+        fi
+
     - name: Install rust toolchain
       uses: actions-rs/toolchain@v1
       with:
@@ -59,7 +59,7 @@ runs:
       id: compile-spell-chcker
       working-directory: .
       shell: bash
-      run: | 
+      run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
         echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
@@ -73,7 +73,7 @@ runs:
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 1
-          fi       
+          fi
 
     - env:
         stepName: Run Spell Checker
@@ -84,7 +84,7 @@ runs:
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
-        
+
         getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}
         spell-checker -c -w ${{ inputs.lexicon}}
         exitStatus=$?
@@ -95,6 +95,6 @@ runs:
         else
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
           exit 1
-        fi       
-      
+        fi
+
 

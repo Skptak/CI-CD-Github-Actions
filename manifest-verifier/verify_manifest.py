@@ -21,7 +21,7 @@ IGNORE_SUBMODULES_LIST = []
 # Obtain submodule path of all entries in manifest.yml file.
 def read_manifest(git_modules, path_manifest):
     dict = {}
-    
+
     with open(git_modules, 'r') as fp:
         module_lines = fp.read()
     if "submodule" not in module_lines:
@@ -32,7 +32,7 @@ def read_manifest(git_modules, path_manifest):
         manifest_data = fp.read()
     yml = load(manifest_data, Loader=Loader)
     if "dependencies" not in yml:
-        print("{0} No dependencies in {0}. Exiting {1}".format(bashInfo, path_manifest, bashEnd)) 
+        print("{0} No dependencies in {0}. Exiting {1}".format(bashInfo, path_manifest, bashEnd))
         exit(0)
 
     # Iterate over all the "dependencies" entries, verify that

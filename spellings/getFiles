@@ -18,7 +18,7 @@ file=""
 excludeDirs=""
 excludeFiles=""
 includeExtensions=""
-if [ $# != 0 ]; then 
+if [ $# != 0 ]; then
     VALID_ARGS=$(getopt -o h,ed:,ef:,if: --long help,exclude-dirs:,exclude-files:,include-extensions: -- "$@")
     eval set -- "$VALID_ARGS"
     while [ : ]; do
@@ -51,9 +51,9 @@ if [ $# != 0 ]; then
                 echo -e "$bashInfo --exclude-files:       A comma seperated list of files to exclude $bashEnd"
                 echo -e "$bashInfo --exclude-dir:         A comma seperated list of directories to exclude $bashEnd"
                 echo -e "$bashInfo --include-extensions:  Any additional exstensions to search for $bashEnd"
-                exit 0    
+                exit 0
                 ;;
-            -- )  
+            -- )
                 shift
                 break
                 ;;

@@ -30,10 +30,10 @@ jobs:
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
           echo "$(pwd)" >> $GITHUB_PATH
-          
+
           sudo apt install fd-find
           fdfind --version
-          
+
           exitStatus=$?
           echo "::endgroup::"
           if [ $exitStatus -eq 0 ]; then
@@ -41,8 +41,8 @@ jobs:
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 1
-          fi       
- 
+          fi
+
       - env:
           stepName: "Functional | Success | getFiles() No Arguments"
         name: ${{ env.stepName }}
@@ -121,7 +121,7 @@ jobs:
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 1
           fi
-      
+
       - env:
           stepName: "Functional | Success | getFiles() Exclude Single Directory and File"
         name: ${{ env.stepName }}
@@ -156,13 +156,13 @@ jobs:
 
           files=$(getFiles --include-extensions="md")
           echo -e "${{ env.bashInfo }} files:\n$files ${{ env.bashEnd }}"
-          
+
           exitStatus=0
           if [[ "$files" != *"README.md"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: goodFiles ${{ env.bashEnd }}"
             exitStatus=1
           fi
-          
+
           echo "::endgroup::"
           if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -170,7 +170,7 @@ jobs:
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             exit 1
           fi
-      
+
       - env:
           stepName: "Functional | Success | getFiles() Exclude Two Directories and Two Files"
         name: ${{ env.stepName }}
@@ -188,22 +188,22 @@ jobs:
             echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: fileFormattedWithClangFormatV16.c ${{ env.bashEnd }}"
             exitStatus=1
           fi
-          
+
           if [[ "$files" == *"badFile.c"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a File it should have skipped: badFile.c ${{ env.bashEnd }}"
             exitStatus=1
           fi
-          
+
           if [[ "$files" == *"filesWithCRLFEndings"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: filesWithCRLFEndings ${{ env.bashEnd }}"
             exitStatus=1
           fi
-          
+
           if [[ "$files" == *"include"* ]]; then
             echo -e "${{ env.bashFail }} Get Files Found a directory it should have skipped: include ${{ env.bashEnd }}"
             exitStatus=1
           fi
-          
+
           echo "::endgroup::"
           if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -537,7 +537,7 @@ jobs:
       - name:  Reset Files
         shell: bash
         run: git reset --hard
-  
+
       - env:
           stepName: "Functional | Failure | Formatting and Whitespace Errror"
         name: ${{ env.stepName }}
@@ -551,7 +551,7 @@ jobs:
       - name:  Reset Files
         shell: bash
         run: git reset --hard
-  
+
       - env:
           stepName: "Functional | Failure | Formatting Errror"
         name: ${{ env.stepName }}
@@ -623,7 +623,7 @@ jobs:
       - name:  Reset Files
         shell: bash
         run: git reset --hard
-                  
+
       - env:
           stepName: Check Failure Test Cases
         name: ${{ env.stepName }}
