@@ -1126,11 +1126,11 @@ jobs:
         with:
           repository: skptak/coreMQTT
           ref: main
-          path: coreMQTT
+          path: coreMQTT_spelling
       - name: Test spell check action
         uses: ./spellings
         with:
-          path: coreMQTT
+          path: coreMQTT_spelling
 
 
   test-rust-spell-check:

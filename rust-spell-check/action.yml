@@ -34,12 +34,16 @@ runs:
       shell: bash
       run: |
         # ${{ env.stepName }}
+        set +e
+        echo -e "ls = $(ls)"
+        echo -e "pwd = $(pwd)"
+        echo -e "ls ../ = $(ls ../)"
+        set -e
         echo "::group::${{ env.stepName }}"
           # This needs the -y flag on the sh. So need to put in a file to run it
           sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install.sh
           chmod 777 install.sh
           ./install.sh -y
-
           # I Split these up into multiple commands so if one errors
           # You can easily see which one causes it
           sudo apt-get install spell -y
@@ -68,6 +72,11 @@ runs:
       working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
+        set +e
+        echo -e "ls = $(ls)"
+        echo -e "pwd = $(pwd)"
+        echo -e "ls ../ = $(ls ../)"
+        set -e
         echo "::group::${{ env.stepName }}"
         echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
         cargo --version
@@ -92,6 +101,11 @@ runs:
       shell: bash
       run: |
         # ${{ env.stepName }}
+        set +e
+        echo -e "ls = $(ls)"
+        echo -e "pwd = $(pwd)"
+        echo -e "ls ../ = $(ls ../)"
+        set -e
         echo "::group::${{ env.stepName }}"
         echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
         export PATH="$PATH:$GITHUB_ACTION_PATH"
@@ -106,5 +120,3 @@ runs:
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
           exit 1
         fi
-
-
