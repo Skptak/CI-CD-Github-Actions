@@ -110,7 +110,7 @@ runs:
         echo "::group::${{ env.stepName }}"
         echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
         export PATH="$PATH:$GITHUB_ACTION_PATH"
-        getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}
+        getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}"
         spell-checker -c -w .cSpellWords.txt
         exitStatus=$?
 
