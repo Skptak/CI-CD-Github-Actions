@@ -1141,11 +1141,11 @@ jobs:
         with:
           repository: skptak/coreMQTT
           ref: main
-          path: coreMQTT
+          path: coreMQTT_rust
       - name: Test spell check action
         uses: ./rust-spell-check
         with:
-          path: coreMQTT
+          path: coreMQTT_rust
 
   test-coverage-cop:
     runs-on: ubuntu-latest
