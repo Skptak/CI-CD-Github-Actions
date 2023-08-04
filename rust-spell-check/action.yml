@@ -31,13 +31,14 @@ runs:
         bashEnd: \033[0m
         stepName: Install Dependencies
       name: ${{ env.stepName }}
+      id: spell-checker-setup
       shell: bash
       run: |
         # ${{ env.stepName }}
         set +e
-        echo -e "ls = $(ls)"
-        echo -e "pwd = $(pwd)"
-        echo -e "ls ../ = $(ls ../)"
+        echo -e "ls = $(ls)\n"
+        echo -e "pwd = $(pwd)\n"
+        echo -e "ls ../ = $(ls ../)\n"
         set -e
         echo "::group::${{ env.stepName }}"
           # This needs the -y flag on the sh. So need to put in a file to run it
@@ -58,6 +59,7 @@ runs:
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
     - name: Install rust toolchain
+      id: install-rust-toolchain
       uses: actions-rs/toolchain@v1
       with:
           toolchain: nightly
@@ -73,9 +75,9 @@ runs:
       run: |
         # ${{ env.stepName }}
         set +e
-        echo -e "ls = $(ls)"
-        echo -e "pwd = $(pwd)"
-        echo -e "ls ../ = $(ls ../)"
+        echo -e "ls = $(ls)\n"
+        echo -e "pwd = $(pwd)\n"
+        echo -e "ls ../ = $(ls ../)\n"
         set -e
         echo "::group::${{ env.stepName }}"
         echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
