@@ -36,7 +36,7 @@ runs:
           sudo apt-get install util-linux
           sudo apt-get install npm
           npm install -g cspell
-          echo "$GITHUB_ACTION_PATH/../helpers" >> $GITHUB_PATH
+          echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           cspell --version
           exitStatus=$?
           set -e

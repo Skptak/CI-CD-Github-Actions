@@ -29,8 +29,7 @@ jobs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          # Add the helper scripts to the path of all future steps
-          echo "$(readlink -f ../helpers)" >> $GITHUB_PATH
+          echo "$(pwd)" >> $GITHUB_PATH
           
           sudo apt install fd-find
           fdfind --version

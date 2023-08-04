@@ -29,10 +29,8 @@ runs:
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
           sudo apt-get install clang-format fd-find
-          ls $GITHUB_ACTION_PATH/../helpers
-          echo -e "$GITHUB_ACTION_PATH/../helpers" >> $GITHUB_PATH
-          export GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH/../helpers
-
+          echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+          
           fdfind --version
           fdInstalled=$?
 
@@ -40,17 +38,9 @@ runs:
           clangFormatInstalled=$?
 
           set +e
-          echo -e "getFilesAdded= $getFilesAdded"
           echo -e "GITHUB_ACTION_PATH= $GITHUB_ACTION_PATH"
           echo -e "ls GITHUB_ACTION_PATH = $(ls $GITHUB_ACTION_PATH)"
-          echo -e "ls GITHUB_ACTION_PATH/.. = $(ls $GITHUB_ACTION_PATH/..)"
           echo -e "pwd= $(pwd)";
-          echo -e "ls (pwd)/../= $(ls $(pwd)/../)";
-          echo -e "ls $(pwd)/../helpers= $(ls $(pwd)/../helpers)";
-          echo -e "$(pwd)/../helpers" >> $GITHUB_PATH
-          echo "$(readlink -f ../helpers)" >> $GITHUB_PATH
-          echo "PATH=$PATH"
-          export PATH="$(pwd)/../helpers"
           echo "PATH=$PATH"
           set -e
 
