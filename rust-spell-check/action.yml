@@ -29,19 +29,23 @@ runs:
         bashInfo: \033[33;1mINFO -
         bashFail: \033[31;1mFAILED -
         bashEnd: \033[0m
-        stepName: Install aspell
+        stepName: Install Dependencies
       name: ${{ env.stepName }}
       shell: bash
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+          echo "Installing spell"
           sudo apt-get install spell -y
+          echo "Installing util-linux"
           sudo apt-get install util-linux -y
-          sudo apt-get install aspell -y
-          sudo apt-get install libaspell-dev -y
-          sudo apt-get install npm -y
+          echo "Installing fd-find"
           sudo apt-get install fd-find -y
+          echo "Installing aspell"
+          sudo apt-get install aspell -y
+          echo "Installing libaspell-dev"
+          sudo apt-get install libaspell-dev -y
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
         exitStatus=$?
