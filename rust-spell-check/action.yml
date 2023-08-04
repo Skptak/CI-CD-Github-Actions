@@ -63,9 +63,9 @@ runs:
     - env:
         stepName: Compile Spell checker
       name: ${{ env.stepName }}
-      id: compile-spell-chcker
-      working-directory: .
+      id: compile-spell-checker
       shell: bash
+      working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
@@ -73,6 +73,7 @@ runs:
         cargo --version
         cargo build --release
         target/release/spell-checker --help
+        mv target/release/spell-checker .
         echo "$(pwd)/target/release" >> $GITHUB_PATH
         exitStatus=$?
           echo "::endgroup::"
