@@ -23,12 +23,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3
     - env:
         bashPass: \033[32;1mPASSED -
         bashInfo: \033[33;1mINFO -
         bashFail: \033[31;1mFAILED -
-        bashEnd: \033[0m
+        bashEnd:  \033[0m
         stepName: Install Dependencies
       name: ${{ env.stepName }}
       id: spell-checker-setup
