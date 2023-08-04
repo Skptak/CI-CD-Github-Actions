@@ -150,7 +150,7 @@ runs:
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
 
           for file in ${files[@]}; do
-            grep -nIe "[[:blank:]]$" "$file" > $fileOut
+            fileOut=$(grep -nIe "[[:blank:]]$" "$file")
             if [ $? -eq 0 ]; then
               echo "${{ env.bashFail }} "$fileOut" ${{ env.bashEnd }}"
               exitStatus=1;
@@ -158,7 +158,7 @@ runs:
           done
 
           echo "::endgroup::"
-          if [ $exitStatus -eq 1 ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             set -e
             exit 1
@@ -179,13 +179,13 @@ runs:
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
           for file in ${files[@]}; do
-            grep -nl $'\r' "$file" > $fileOut
+            fileOut=$(grep -nl $'\r' "$file")
             if [ $? -eq 0 ]; then
               echo "${{ env.bashFail }} "$fileOut" ${{ env.bashEnd }}"
               exitStatus=1;
             fi
           done
-          if [ $exitStatus -eq 1 ]; then
+          if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             set -e
             exit 1
