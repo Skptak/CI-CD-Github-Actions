@@ -37,7 +37,7 @@ runs:
           sudo apt-get install fd-find -y
           # This is a 1000+ line log for the install
           # Wrap it in an echo group
-          echo "::group:: NPM Install"
+          echo "::group::NPM Install"
           sudo apt-get install npm -y
           sudo npm install -g cspell
           echo "::endgroup::"
