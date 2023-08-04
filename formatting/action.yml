@@ -82,15 +82,11 @@ runs:
           echo -e "${{ env.bashInfo }} Using clang-format version "$(clang-format --version)" ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
 
-          # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
-          # This would mean the first time a file fails the check that we exit without formatting all files.
-
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
           if [ ! $? -eq 0 ]; then
               echo -e "${{ env.bashFail }} Error calling getFiles() ${{ env.bashEnd }}"
               echo -e "$fileOut"
-              set -e
               exit 1
           fi
 

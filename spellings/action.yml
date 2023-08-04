@@ -62,7 +62,7 @@ runs:
           echo "::group::${{ env.stepName }}"
           set +e
           export PATH="$PATH:$GITHUB_ACTION_PATH"
-          files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files=${{ inputs.exclude-files }} --include-extensions=${{ inputs.include-extensions}})
+          files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions}}")
           cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context --file-list "$file"
           exitStatus=$?
           set -e
