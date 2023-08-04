@@ -34,7 +34,7 @@ runs:
           echo "::group::${{ env.stepName }}"
           sudo apt-get install spell
           sudo apt-get install util-linux
-          sudo apt-get install npm
+          sudo apt-get install npm fd-find
           npm install -g cspell
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
