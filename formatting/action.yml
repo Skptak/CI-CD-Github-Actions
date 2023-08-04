@@ -43,7 +43,8 @@ runs:
           echo -e "pwd= $(pwd)";
           echo "PATH=$PATH"
           set -e
-
+          ls
+          export PATH="$PATH:$GITHUB_ACTION_PATH"
           getFiles --help
           getFilesAdded=$?
           echo -e "getFilesAdded=$getFilesAdded"
@@ -92,7 +93,7 @@ runs:
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
           # This would mean the first time a file fails the check that we exit without formatting all files.
           set +e
-
+          export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
           if [ ! $? -eq 0 ]; then
               echo -e "${{ env.bashFail }} Error calling getFiles() ${{ env.bashEnd }}"
@@ -144,8 +145,8 @@ runs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-
           set +e
+          export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
 
           for file in ${files[@]}; do
@@ -175,7 +176,7 @@ runs:
         run: |
           # ${{ env.stepName }}
           set +e
-
+          export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
           for file in ${files[@]}; do
             grep -nl $'\r' "$file" > $fileOut
