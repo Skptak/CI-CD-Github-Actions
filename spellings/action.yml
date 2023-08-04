@@ -35,7 +35,7 @@ runs:
           sudo apt-get install spell
           sudo apt-get install util-linux
           sudo apt-get install npm fd-find
-          npm install -g cspell
+          sudo npm install -g cspell
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           pwd
@@ -60,12 +60,12 @@ runs:
         run: |
           #  ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          set +e
+          ##set +e
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions}}")
           cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context --file-list "$file"
           exitStatus=$?
-          set -e
+          #set -e
           echo "::endgroup::"
           if [ $exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"

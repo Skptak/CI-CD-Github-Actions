@@ -26,7 +26,7 @@ runs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          set +e
+          #set +e
           pip install -r $GITHUB_ACTION_PATH/requirements.txt
           exitStatus=$?
           echo "::endgroup::"

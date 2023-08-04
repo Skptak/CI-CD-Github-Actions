@@ -40,7 +40,7 @@ runs:
         shell: bash
         run: |
           # ${{ env.stepName }}
-          set +e
+          #set +e
           exitStatus=0
           # Check exclude dirs for possible input issues
           if [[ "${{ inputs.exclude-dirs }}" = *" "* ]]; then
@@ -69,7 +69,7 @@ runs:
 
           # GitHub automatically use "set -e" which causes scripts to fail on the first exit code
           # This would mean the first time a file fails the check that we exit without formatting all files.
-          set +e
+          #set +e
 
           # Get all files that end in .c or .h.
           # Exclude any files or directories that we were asked to.
@@ -124,7 +124,7 @@ runs:
         working-directory: ${{ inputs.path }}
         run: |
           # ${{ env.stepName }}
-          set +e
+          #set +e
           grep --exclude={README.md,${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},.git} -rnIe "[[:blank:]]$" .
           if [ "$?" = "0" ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -143,7 +143,7 @@ runs:
         shell: bash
         run: |
           # ${{ env.stepName }}
-          set +e
+          #set +e
           grep --exclude={${{inputs.exclude-files}},} --exclude-dir={${{inputs.exclude-dirs}},.git} -rnl $'\r'
           if [ "$?" = "0" ]; then
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"

@@ -92,8 +92,8 @@ runs:
           # Check if a success line was provided. Converting the github input to a bash variable
           # Will cause it to tokenize on spaces when passed into python
           # So just only add the success line if it exits.
-          # set +e so if the run fails we can capture that and print custom error message
-          set +e
+          # #set +e so if the run fails we can capture that and print custom error message
+          #set +e
           if [ "${{ inputs.success-line }}" != "" ]; then
             successLineArgs="--success-line=\"${{ inputs.success-line}}\" $optArgs"
             echo "Adding --success-line=${{ inputs.success-line}}"

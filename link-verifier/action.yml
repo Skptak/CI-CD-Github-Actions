@@ -79,7 +79,7 @@ runs:
         fi
 
         echo -e "${{ env.bashInfo }} Running verify-links.py ${args} --user-agent \"${{ inputs.user-agent }}\" ${{ env.bashEnd }}"
-        set +e
+        #set +e
         python3 ${GITHUB_ACTION_PATH}/verify-links.py ${args} --user-agent "${{ inputs.user-agent }}";
         exitStatus=$?
         set -e
