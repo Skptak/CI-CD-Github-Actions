@@ -38,8 +38,7 @@ runs:
           sudo npm install -g cspell
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
-          pwd
-          ls -al
+          cp cspell.config.yaml ${{ inputs.path }}
           which getFiles
           fdfind
           cspell --version

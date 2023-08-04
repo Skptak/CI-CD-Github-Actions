@@ -114,6 +114,13 @@ jobs:
               #org: aws,
               org: skptak,
             },
+            {
+            repository: FreeRTOS-Kernel,
+            exclude-files: lexicon.txt,
+            exclude-dirs: "build,docs,portable",
+            #org: aws,
+            org: skptak,
+            },
           ]
     steps:
       - uses: actions/checkout@v3
