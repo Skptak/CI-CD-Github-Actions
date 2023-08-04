@@ -35,16 +35,14 @@ runs:
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-          echo "Installing spell"
+          # This needs the -y flag on the sh
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
+          # I Split these up into multiple commands so if one errors
+          # You can easily see which one causes it
           sudo apt-get install spell -y
-          echo "Installing util-linux"
           sudo apt-get install util-linux -y
-          echo "Installing fd-find"
           sudo apt-get install fd-find -y
-          echo "Installing aspell"
           sudo apt-get install aspell -y
-          echo "Installing libaspell-dev"
           sudo apt-get install libaspell-dev -y
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
