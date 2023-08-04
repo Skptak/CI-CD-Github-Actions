@@ -30,6 +30,7 @@ runs:
           echo "::group::${{ env.stepName }}"
           sudo apt-get install clang-format fd-find
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+          export PATH="$PATH:$GITHUB_ACTION_PATH"
 
           fdfind --version
           fdInstalled=$?
@@ -37,7 +38,6 @@ runs:
           clang-format --version
           clangFormatInstalled=$?
 
-          export PATH="$PATH:$GITHUB_ACTION_PATH"
           getFiles --help
           getFilesAdded=$?
 
