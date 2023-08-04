@@ -34,9 +34,14 @@ runs:
           echo "::group::${{ env.stepName }}"
           sudo apt-get install spell -y
           sudo apt-get install util-linux -y
-          sudo apt-get install npm -y
           sudo apt-get install fd-find -y
+          # This is a 1000+ line log for the install
+          # Wrap it in an echo group
+          echo "::group:: NPM Install"
+          sudo apt-get install npm -y
           sudo npm install -g cspell
+          echo "::endgroup::"
+
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           echo -e "pwd =$(pwd)"
