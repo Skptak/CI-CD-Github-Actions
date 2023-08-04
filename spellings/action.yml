@@ -40,8 +40,10 @@ runs:
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           echo -e "pwd =$(pwd)"
           echo -e "ls =$(ls)"
-          echo -e "ls "$GITHUB_ACTION_PATH =$(ls $GITHUB_ACTION_PATH)"
+          echo -e "ls $GITHUB_ACTION_PATH =$(ls $GITHUB_ACTION_PATH)"
+          set +e # Handle the case where the working directory is the root by ignoring the error
           cp $GITHUB_ACTION_PATH/cspell.config.yaml ${{ inputs.path }}
+          set -e
           which getFiles
           fdfind
           cspell --version
