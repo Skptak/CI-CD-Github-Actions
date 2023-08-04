@@ -1123,6 +1123,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
@@ -1130,17 +1139,44 @@ jobs:
           ref: main
           path: coreMQTT
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test spell check action
         if: success() || failure()
         uses: ./spellings
         with:
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
   test-spell-check-just-rust-dir:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
@@ -1148,23 +1184,59 @@ jobs:
           ref: main
           path: coreMQTT_rust
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test spell check action
         if: success() || failure()
         uses: ./spellings
         with:
           path: coreMQTT_rust
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
   test-spell-check-two-dirs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
           repository: skptak/coreMQTT
           ref: main
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - name: Test spell check action
         if: success() || failure()
@@ -1172,12 +1244,30 @@ jobs:
         with:
           path: coreMQTT
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
           repository: skptak/coreMQTT
           ref: main
           path: coreMQTT_rust
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - name: Test spell check action rust dir
         if: success() || failure()
@@ -1185,10 +1275,28 @@ jobs:
         with:
           path: coreMQTT_rust
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
   test-rust-spell-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - uses: actions/checkout@v3
         if: success() || failure()
@@ -1196,6 +1304,15 @@ jobs:
           repository: skptak/coreMQTT
           ref: main
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - name: Test spell check action
         if: success() || failure()
@@ -1207,6 +1324,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
@@ -1214,8 +1341,17 @@ jobs:
           ref: main
           path: coreMQTT_rust
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test spell check action
-        uses: ./spellings
+        uses: ./rust-spell-check
         if: success() || failure()
         with:
           path: coreMQTT_rust
@@ -1224,12 +1360,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
           repository: skptak/coreMQTT
           ref: main
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - uses: actions/checkout@v3
         if: success() || failure()
@@ -1238,11 +1393,29 @@ jobs:
           ref: main
           path: coreMQTT_rust
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test spell check action
         if: success() || failure()
         uses: ./rust-spell-check
         with:
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - name: Test spell check action rust dir
         if: success() || failure()
@@ -1255,6 +1428,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
@@ -1262,29 +1444,74 @@ jobs:
           ref: main
           path: coreMQTT
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test spell check action
         if: success() || failure()
         uses: ./spellings
         with:
           path: coreMQTT
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test rust spell check action
         if: success() || failure()
         uses: ./rust-spell-check
         with:
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
   test-both-spell-checks-both-dirs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - uses: actions/checkout@v3
         if: success() || failure()
         with:
           repository: skptak/coreMQTT
           ref: main
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - name: Test spell check action
         if: success() || failure()
@@ -1292,11 +1519,29 @@ jobs:
         with:
           path: coreMQTT
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test rust spell check action
         if: success() || failure()
         uses: ./rust-spell-check
         with:
           path: coreMQTT
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
       - uses: actions/checkout@v3
         if: success() || failure()
@@ -1305,17 +1550,44 @@ jobs:
           ref: main
           path: coreMQTT_rust
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test spell check action
         if: success() || failure()
         uses: ./spellings
         with:
           path: coreMQTT_rust
 
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
+
       - name: Test rust spell check action
         if: success() || failure()
         uses: ./rust-spell-check
         with:
           path: coreMQTT_rust
+
+      - name: Check Directories
+        if: success() || failure()
+        shell: bash
+        run: |
+          set +e
+          echo -e "ls = $(ls)\n"
+          echo -e "pwd = $(pwd)\n"
+          set -e
 
   test-coverage-cop:
     runs-on: ubuntu-latest
