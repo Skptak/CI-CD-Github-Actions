@@ -35,7 +35,6 @@ runs:
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
-        cp .cSpellWords.txt ${{ inputs.path }}
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         sudo apt-get install aspell libaspell-dev util-linux
         exitStatus=$?
@@ -88,7 +87,7 @@ runs:
         echo "::group::${{ env.stepName }}"
 
         getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}
-        spell-checker -c -w ${{ inputs.lexicon}}
+        spell-checker -c -w .cSpellWords.txt
         exitStatus=$?
 
         echo "::endgroup::"

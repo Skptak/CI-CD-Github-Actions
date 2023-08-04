@@ -38,9 +38,10 @@ runs:
           sudo npm install -g cspell
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
-          pwd
-          ls
-          cp cspell.config.yaml ${{ inputs.path }}
+          echo -e "pwd =$(pwd)"
+          echo -e "ls =$(ls)"
+          echo -e "ls "$GITHUB_ACTION_PATH =$(ls $GITHUB_ACTION_PATH)"
+          cp $GITHUB_ACTION_PATH/cspell.config.yaml ${{ inputs.path }}
           which getFiles
           fdfind
           cspell --version
