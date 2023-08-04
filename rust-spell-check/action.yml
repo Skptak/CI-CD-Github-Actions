@@ -102,9 +102,9 @@ runs:
       run: |
         # ${{ env.stepName }}
         set +e
-        echo -e "ls = $(ls)"
-        echo -e "pwd = $(pwd)"
-        echo -e "ls ../ = $(ls ../)"
+        echo -e "ls = $(ls)\n"
+        echo -e "pwd = $(pwd)\n"
+        echo -e "ls ../ = $(ls ../)\n"
         set -e
         echo "::group::${{ env.stepName }}"
         echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH

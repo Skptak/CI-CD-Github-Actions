@@ -21,69 +21,79 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - env:
-          stepName: Install Spell
-          bashPass:   \033[32;1mPASSED -
-          bashInfo:   \033[33;1mINFO -
-          bashFail:   \033[31;1mFAILED -
-          bashEnd:    \033[0m
-        name: ${{ env.stepName }}
-        shell: bash
-        run: |
-          #  ${{ env.stepName }}
-          echo "::group::${{ env.stepName }}"
-          sudo apt-get install spell -y
-          sudo apt-get install util-linux -y
-          sudo apt-get install fd-find -y
-          # This is a 1000+ line log for the install
-          # Wrap it in an echo group
-          echo "::group::NPM Install"
-          sudo apt-get install npm -y
-          sudo npm install -g cspell
-          echo "::endgroup::"
+    - env:
+        stepName: Install Spell
+        bashPass:   \033[32;1mPASSED -
+        bashInfo:   \033[33;1mINFO -
+        bashFail:   \033[31;1mFAILED -
+        bashEnd:    \033[0m
+      name: ${{ env.stepName }}
+      shell: bash
+      run: |
+        #  ${{ env.stepName }}
+        set +e
+        echo -e "ls = $(ls)\n"
+        echo -e "pwd = $(pwd)\n"
+        echo -e "ls ../ = $(ls ../)\n"
+        set -e
+        echo "::group::${{ env.stepName }}"
+        sudo apt-get install spell -y
+        sudo apt-get install util-linux -y
+        sudo apt-get install fd-find -y
+        # This is a 1000+ line log for the install
+        # Wrap it in an echo group
+        echo "::group::NPM Install"
+        sudo apt-get install npm -y
+        sudo npm install -g cspell
+        echo "::endgroup::"
 
-          echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-          export PATH="$PATH:$GITHUB_ACTION_PATH"
-          echo -e "pwd =$(pwd)"
-          echo -e "ls =$(ls)"
-          echo -e "ls $GITHUB_ACTION_PATH =$(ls $GITHUB_ACTION_PATH)"
-           # cp has an error code if it's asked to copy to the same file
-           # Wrap it in a set +e in case the input path is the working directory
-          set +e
-          cp $GITHUB_ACTION_PATH/cspell.config.yaml ${{ inputs.path }}
-          set -e
-          which getFiles
-          fdfind
-          cspell --version
-          exitStatus=$?
-          echo "::endgroup::"
-          # Only get to here if everything above passes
-          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+        echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+        export PATH="$PATH:$GITHUB_ACTION_PATH"
+        echo -e "pwd =$(pwd)"
+        echo -e "ls =$(ls)"
+        echo -e "ls $GITHUB_ACTION_PATH =$(ls $GITHUB_ACTION_PATH)"
+          # cp has an error code if it's asked to copy to the same file
+          # Wrap it in a set +e in case the input path is the working directory
+        set +e
+        cp $GITHUB_ACTION_PATH/cspell.config.yaml ${{ inputs.path }}
+        set -e
+        which getFiles
+        fdfind
+        cspell --version
+        exitStatus=$?
+        echo "::endgroup::"
+        # Only get to here if everything above passes
+        echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
-      - env:
-          stepName: Check Spelling
-        name: ${{ env.stepName}}
-        shell: bash
-        working-directory: ${{ inputs.path }}
-        run: |
-          #  ${{ env.stepName }}
-          echo "::group::${{ env.stepName }}"
-          export PATH="$PATH:$GITHUB_ACTION_PATH"
-          files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions}}")
-          set +e
-          exitStatus=0
-          for file in ${files[@]}; do
-            cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context "$file"
-            if ! [ $? -eq 0 ]; then
-              exitStatus=1
-            fi
-          done
-          set -e
-          echo "::endgroup::"
-          if [ $exitStatus -eq 0 ]; then
-            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-          else
-            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 1
+    - env:
+        stepName: Check Spelling
+      name: ${{ env.stepName}}
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: |
+        #  ${{ env.stepName }}
+        set +e
+        echo -e "ls = $(ls)\n"
+        echo -e "pwd = $(pwd)\n"
+        echo -e "ls ../ = $(ls ../)\n"
+        set -e
+        echo "::group::${{ env.stepName }}"
+        export PATH="$PATH:$GITHUB_ACTION_PATH"
+        files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions}}")
+        set +e
+        exitStatus=0
+        for file in ${files[@]}; do
+          cspell --language-id C --color -c cspell.config.yaml --show-suggestions --show-context "$file"
+          if ! [ $? -eq 0 ]; then
+            exitStatus=1
           fi
+        done
+        set -e
+        echo "::endgroup::"
+        if [ $exitStatus -eq 0 ]; then
+          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+        else
+          echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          exit 1
+        fi
 
