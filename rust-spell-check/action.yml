@@ -35,8 +35,11 @@ runs:
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
-          # This needs the -y flag on the sh
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
+          # This needs the -y flag on the sh. So need to put in a file to run it
+          sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install.sh
+          chmod 777 install.sh
+          ./install.sh -y
+
           # I Split these up into multiple commands so if one errors
           # You can easily see which one causes it
           sudo apt-get install spell -y
