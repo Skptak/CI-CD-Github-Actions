@@ -119,7 +119,7 @@ runs:
           echo "::endgroup::"
           set -e
           if [ $clangError -eq 1 ]; then
-            echo -e "${{ env.bashFail }} Clang Encountered an Error ${{ env.bashEnd }}
+            echo -e "${{ env.bashFail }} Clang Encountered an Error ${{ env.bashEnd }}"
           fi
 
           if [ $exitCode -eq 0 ]; then
@@ -128,6 +128,5 @@ runs:
             echo -e "${{ env.bashFail }} List of files with formatting errors: ${{ env.bashEnd }}"
             echo -e "${{ env.bashFail }} "$(git diff --name-only)" ${{ env.bashEnd }} "
             echo -e "${{ env.bashFail }} ${{env.stepName }} ${{ env.bashEnd }}"
-            # If there is an error, set this flag high again so the exit 1 fails the run instantly
           fi
           exit $exitCode || $clangError
