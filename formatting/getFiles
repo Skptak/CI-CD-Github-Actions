@@ -76,5 +76,7 @@ files=$(fdfind -e c -e h $excludeDirs $excludeFiles $includeExtensions --exec gr
 
 finalFiles=("")
 for file in ${files[@]}; do
-    echo "$file"
+    if ! [ -z "$file" ]; then
+        echo "$file"
+    fi
 done
