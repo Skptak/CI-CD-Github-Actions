@@ -42,7 +42,9 @@ runs:
           echo -e "pwd =$(pwd)"
           echo -e "ls =$(ls)"
           echo -e "ls $GITHUB_ACTION_PATH =$(ls $GITHUB_ACTION_PATH)"
-          set +e # Handle the case where the working directory is the root by ignoring the error
+           # cp has an error code if it's asked to copy to the same file
+           # Wrap it in a set +e in case the input path is the working directory
+          set +e
           cp $GITHUB_ACTION_PATH/cspell.config.yaml ${{ inputs.path }}
           set -e
           which getFiles
@@ -50,12 +52,8 @@ runs:
           cspell --version
           exitStatus=$?
           echo "::endgroup::"
-          if [ $exitStatus -eq 0 ]; then
-            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-          else
-            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 1
-          fi
+          # Only get to here if everything above passes
+          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
       - env:
           stepName: Check Spelling

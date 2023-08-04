@@ -46,14 +46,9 @@ runs:
           sudo apt-get install libaspell-dev -y
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"
-        exitStatus=$?
         echo "::endgroup::"
-        if [ $exitStatus -eq 0 ]; then
-          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-        else
-          echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-          exit 1
-        fi
+        # Only get to here if nothing above fails
+        echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
     - name: Install rust toolchain
       uses: actions-rs/toolchain@v1
