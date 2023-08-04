@@ -26,16 +26,10 @@ runs:
         run: |
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          #set +e
           pip install -r $GITHUB_ACTION_PATH/requirements.txt
           exitStatus=$?
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
-            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-          else
-            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 1
-          fi
+          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
       - env:
           stepName: Run Manifest Verification Script

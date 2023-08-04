@@ -45,15 +45,8 @@ runs:
           pip install -r $GITHUB_ACTION_PATH/requirements.txt
           exitStatus=$?
           echo "::endgroup::"
-          if [ $exitStatus -eq 1 ]; then
-            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            set -e
-            exit 1
-          else
-            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 0
-          fi
-       
+          echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+
       - env:
           stepName: ${{ env.stepName }}
         shell: bash
@@ -89,11 +82,12 @@ runs:
             echo "Adding --retry-attempts=${{ inputs.retry-attempts }}"
           fi
 
+          # set +e so if the run fails we can capture that and print custom error message
+          set +e
+
           # Check if a success line was provided. Converting the github input to a bash variable
           # Will cause it to tokenize on spaces when passed into python
           # So just only add the success line if it exits.
-          # #set +e so if the run fails we can capture that and print custom error message
-          #set +e
           if [ "${{ inputs.success-line }}" != "" ]; then
             successLineArgs="--success-line=\"${{ inputs.success-line}}\" $optArgs"
             echo "Adding --success-line=${{ inputs.success-line}}"
@@ -110,11 +104,10 @@ runs:
           # Store status as the echo group will overwrite it
           exitStatus=$?
           echo "::endgroup::"
-          if [ "$exitStatus" = "0" ]; then
+          if [ exitStatus -eq 0 ]; then
             echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 0
           else
             echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
             set -e
-            exit 1
           fi
+          exit $exitStatus

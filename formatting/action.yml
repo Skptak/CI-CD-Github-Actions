@@ -91,6 +91,7 @@ runs:
               exit 1
           fi
 
+          # set +e
           # Loop over the files that matched the above conditions
           for file in ${files[@]}; do
             # Print them out for future debugging
@@ -114,7 +115,7 @@ runs:
           git diff --exit-code
           exitCode=$?
           echo "::endgroup::"
-          set -e
+          # set -e
           if [ $clangError -eq 1 ]; then
             echo -e "${{ env.bashFail }} Clang Encountered an Error ${{ env.bashEnd }}"
           fi

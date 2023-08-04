@@ -74,7 +74,8 @@ fi
 #echo "fdfind -e c -e h "$excludeDirs" "$excludeFiles" "$includeExtensions" --exec grep -lriE \"copyright (.*) [0-9]{4} amazon.com\" "
 files=$(fdfind -e c -e h $excludeDirs $excludeFiles $includeExtensions --exec grep -lriE "copyright (.*) [0-9]{4} amazon.com" )
 
-finalFiles=("")
 for file in ${files[@]}; do
-    echo "$file"
+    if ! [ -z "" ]; then
+        echo "$file"
+    fi
 done

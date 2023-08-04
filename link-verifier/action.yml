@@ -79,17 +79,15 @@ runs:
         fi
 
         echo -e "${{ env.bashInfo }} Running verify-links.py ${args} --user-agent \"${{ inputs.user-agent }}\" ${{ env.bashEnd }}"
-        #set +e
+        set +e
         python3 ${GITHUB_ACTION_PATH}/verify-links.py ${args} --user-agent "${{ inputs.user-agent }}";
         exitStatus=$?
         set -e
         echo "::endgroup::"
         # We check the backwards condition for this one
-        if [ "$exitStatus" = "1" ]; then
+        if [ $exitStatus -eq 1 ]; then
           echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-          set -e
-          exit 1
         else
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-          exit 0
         fi
+        exit $exitStatus
