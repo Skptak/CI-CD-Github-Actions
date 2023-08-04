@@ -59,7 +59,7 @@ if [ $# != 0 ]; then
                 echo -e "$bashInfo --include-extensions:  Any additional exstensions to search for $bashEnd"
                 exit 0
                 ;;
-            -- ) 
+            -- )
                 shift
                 break
                 ;;

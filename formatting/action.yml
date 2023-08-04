@@ -81,7 +81,8 @@ runs:
           # ${{ env.stepName }}
           echo -e "${{ env.bashInfo }} Using clang-format version "$(clang-format --version)" ${{ env.bashEnd }}"
           echo "::group::${{ env.stepName }}"
-
+          exitCode=0
+          clangError=0
           export PATH="$PATH:$GITHUB_ACTION_PATH"
           files=$(getFiles --exclude-files="${{inputs.exclude-files}}" --exclude-dir="${{inputs.exclude-dirs}}" )
           if [ ! $? -eq 0 ]; then

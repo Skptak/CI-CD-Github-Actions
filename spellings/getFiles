@@ -26,21 +26,27 @@ if [ $# != 0 ]; then
             ed | --exclude-dirs )
                 # $2 Holds the argument passed after --exclude-files or --ed
                 # Use sed to replace the commas with the exclude flag
-                excludeDirs="-E $(echo "$2" | sed -r 's/,/ -E /g' )"
+                if ! [ -z "$2" ]; then
+                    excludeDirs="-E $(echo "$2" | sed -r 's/,/ -E /g' )"
+                fi
                 shift 2
                 ;;
 
             ef | --exclude-files )
                 # $2 Holds the argument passed after --exclude-files or --ed
                 # Use sed to replace the commas with the exclude flag
-                excludeFiles="-E $( echo "$2" | sed -r 's/,/ -E /g' )"
+                if ! [ -z "$2" ]; then
+                    excludeFiles="-E $( echo "$2" | sed -r 's/,/ -E /g' )"
+                fi
                 shift 2
                 ;;
 
             if | --include-extensions )
                 # $2 Holds the argument passed after --exclude-files or --ed
                 # Use sed to replace the commas with the exclude flag
-                includeExtensions="-e $( echo "$2" | sed -r 's/,/ -E /g' )"
+                if ! [ -z "$2" ]; then
+                    includeExtensions="-e $( echo "$2" | sed -r 's/,/ -E /g' )"
+                fi
                 shift 2
                 ;;
 
