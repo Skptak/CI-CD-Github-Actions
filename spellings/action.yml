@@ -32,9 +32,10 @@ runs:
         run: |
           #  ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
-          sudo apt-get install spell
-          sudo apt-get install util-linux
-          sudo apt-get install npm fd-find
+          sudo apt-get install spell -y
+          sudo apt-get install util-linux -y
+          sudo apt-get install npm -y
+          sudo apt-get install fd-find -y
           sudo npm install -g cspell
           echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
           export PATH="$PATH:$GITHUB_ACTION_PATH"

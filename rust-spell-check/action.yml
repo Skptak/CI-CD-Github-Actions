@@ -36,7 +36,14 @@ runs:
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-        sudo apt-get install aspell libaspell-dev util-linux
+          sudo apt-get install spell -y
+          sudo apt-get install util-linux -y
+          sudo apt-get install aspell -y
+          sudo apt-get install libaspell-dev -y
+          sudo apt-get install npm -y
+          sudo apt-get install fd-find -y
+          echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+          export PATH="$PATH:$GITHUB_ACTION_PATH"
         exitStatus=$?
         echo "::endgroup::"
         if [ $exitStatus -eq 0 ]; then
@@ -85,7 +92,8 @@ runs:
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
-
+        echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+        export PATH="$PATH:$GITHUB_ACTION_PATH"
         getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}
         spell-checker -c -w .cSpellWords.txt
         exitStatus=$?
