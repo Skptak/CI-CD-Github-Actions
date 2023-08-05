@@ -64,18 +64,12 @@ runs:
           sudo apt install rustc -y
           echo "::endgroup::Install Build Dependencies"
 
-          echo -e "${{ env.bashFail }} cargo --version = $(cargo --version) ${{ env.bashEnd }}
-          echo -e "${{ env.bashFail }} rustc --version = $(rustc --version) ${{ env.bashEnd }}
+          echo -e "${{ env.bashFail }} cargo --version = $(cargo --version) ${{ env.bashEnd }}"
+          echo -e "${{ env.bashFail }} rustc --version = $(rustc --version) ${{ env.bashEnd }}"
 
           cargo build --release
           mv target/release/spell-checker .
-          readlink -f spell-checker
-          echo "ls = $(ls)"
-          echo "pwd= $(pwd)"
-          echo "PATH= $PATH"
-          echo "$(pwd)" >> $GITHUB_PATH
           spell-checker --help
-          exitStatus=$?
           echo "::endgroup::Compile Spell Checker"
           # Only make it to here if nothing above fails
           echo -e "${{ env.bashPass }} Compiled the Spell Checker ${{ env.bashEnd }}"
