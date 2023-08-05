@@ -1150,6 +1150,22 @@ jobs:
         with:
           path: coreMQTT
 
+  test-rust-spell-check-called-through-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/checkout@v3
+        with:
+          repository: skptak/coreMQTT
+          ref: main
+          path: coreMQTT
+
+      - name: Test spell check action
+        uses: Skptak/CI-CD-Github-Actions/rust-spell-check@main
+        with:
+          path: coreMQTT
+
   test-coverage-cop:
     runs-on: ubuntu-latest
     steps:

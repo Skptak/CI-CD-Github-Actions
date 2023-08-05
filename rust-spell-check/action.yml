@@ -48,10 +48,10 @@ runs:
         echo -e " ${{ env.bashInfo }} Check for pre-build spell checker ${{ env.bashEnd }}"
         set +e
         echo "ls = $(ls)"
-        echo "PATH = $PATH"
-        echo "pwd = $(pwd)"
-        echo "find = $(find . -name "spell-checker)"
-        export PATH="$(pwd):$PATH"
+        echo -e "PATH = $PATH"
+        echo -e "pwd = $(pwd)"
+        echo -e "find = $(find . -name 'spell-checker')"
+        #export PATH="$(pwd):$PATH"
         spell-checker
         exitCode=$?
         set -e
@@ -73,10 +73,10 @@ runs:
           echo -e "${{ env.bashInfo }} rustc --version = $(rustc --version) ${{ env.bashEnd }}"
 
           cargo build --release
-          echo "find = $(find . -name "spell-checker)"
+          echo -e "find = $(find . -name 'spell-checker') "
           echo -e "ls target/release = $(ls target/release)"
           echo -e "ls  = $(ls)"
-          mv $(find . -name "spell-checker) .
+          mv $(find . -name "spell-checker") .
           spell-checker --help
           echo "::endgroup::Compile Spell Checker"
           # Only make it to here if nothing above fails
