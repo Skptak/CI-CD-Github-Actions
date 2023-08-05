@@ -27,8 +27,8 @@ runs:
         bashInfo: \033[33;1mINFO -
         bashFail: \033[31;1mFAILED -
         bashEnd:  \033[0m
-      id: spell-checker-setup
       name: ${{ env.stepName }}
+      id: spell-checker-setup
       shell: bash
       run: |
         #  ${{ env.stepName }}
@@ -63,6 +63,10 @@ runs:
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
     - env:
+        bashPass: \033[32;1mPASSED -
+        bashInfo: \033[33;1mINFO -
+        bashFail: \033[31;1mFAILED -
+        bashEnd:  \033[0m
         stepName: Check Spelling
       name: ${{ env.stepName}}
       id: run-spell-checker

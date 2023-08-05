@@ -55,6 +55,10 @@ runs:
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd}}"
 
     - env:
+        bashPass: \033[32;1mPASSED -
+        bashInfo: \033[33;1mINFO -
+        bashFail: \033[31;1mFAILED -
+        bashEnd:  \033[0m
         stepName: Run link verifier script
       name: ${{ env.stepName }}
       shell: bash

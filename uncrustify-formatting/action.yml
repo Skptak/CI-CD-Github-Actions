@@ -17,6 +17,10 @@ runs:
   using: "composite"
   steps:
       - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: Install Uncrustify
         shell: bash
         run: |
@@ -55,6 +59,10 @@ runs:
           exit $exitStatus
 
       - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: Run Uncrustify
         name: ${{ env.stepName }}
         if: ${{ steps.validate-inputs.outcome}} = "success"
@@ -112,6 +120,10 @@ runs:
           fi
 
       - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: Check For Trailing Whitespace
         name: ${{ env.stepName }}
         shell: bash
@@ -134,6 +146,10 @@ runs:
           fi
 
       - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: Check for CRLF
         name: ${{ env.stepName }}
         if: success() || failure() && ${{ steps.validate-inputs.outcome}} = "success"

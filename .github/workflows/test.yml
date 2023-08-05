@@ -757,7 +757,7 @@ jobs:
         run: |
             # {{ env.stepName }}
             set -x
-            echo "${{ env.bashInfo }} Getting Future Times to Compare Against ${{ env.bashEnd }}"
+            echo -e "${{ env.bashInfo }} Getting Future Times to Compare Against ${{ env.bashEnd }}"
             echo      "exitCodeTwoMinutes=$(date --date='2 minutes' +%M)" >> "$GITHUB_ENV"
             echo "successLineThreeMinutes=$(date --date='3 minutes' +%H:%M)" >> "$GITHUB_ENV"
             echo  "successLineFiveMinutes=$(date --date='5 minutes' +%H:%M)" >> "$GITHUB_ENV"

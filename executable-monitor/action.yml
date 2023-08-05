@@ -35,7 +35,7 @@ runs:
           bashPass:   \033[32;1mPASSED -
           bashInfo:   \033[33;1mINFO -
           bashFail:   \033[31;1mFAILED -
-          bashEnd:     ${{ env.bashEnd }}
+          bashEnd:    \033[0m
           stepName: Install Dependencies
         name: ${{ env.stepName }}
         shell: bash
@@ -48,6 +48,10 @@ runs:
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
       - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: ${{ env.stepName }}
         shell: bash
         run: |

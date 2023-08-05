@@ -17,9 +17,10 @@ runs:
   using: "composite"
   steps:
       - env:
-          bashInfo:   \033[33;1mINFO -
-          bashFail:   \033[31;1mFAILED -
-          bashEnd:    \033[0m
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: Install Manifest Verification Dependencies
         name: ${{ env.stepName }}
         shell: bash
@@ -32,6 +33,10 @@ runs:
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
       - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: Run Manifest Verification Script
         name: ${{ env.stepName }}
         working-directory: ${{ inputs.path }}
@@ -40,7 +45,7 @@ runs:
           # ${{ env.stepName }}
           echo "::group::${{ env.stepName }}"
           if [[ "${{ inputs.fail-on-incorrect-version }}" == "true" ]]; then
-            echo "${{env.bashInfo}} Value of flag is ${{ inputs.fail-on-incorrect-version }} ${{ env.bashEnd }}"
+            echo -e "${{ env.bashInfo}} Value of flag is ${{ inputs.fail-on-incorrect-version }} ${{ env.bashEnd }}"
             python3 $GITHUB_ACTION_PATH/verify_manifest.py --ignore-submodule-path=${{ inputs.exclude-submodules }} --fail-on-incorrect-version
           else
             python3 $GITHUB_ACTION_PATH/verify_manifest.py --ignore-submodule-path=${{ inputs.exclude-submodules }}

@@ -22,6 +22,10 @@ runs:
   using: "composite"
   steps:
       - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0m
           stepName: Install Clang Format
         name: ${{ env.stepName }}
         shell: bash
