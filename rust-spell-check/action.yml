@@ -33,6 +33,7 @@ runs:
       id: spell-checker-setup
       shell: bash
       continue-on-error: true
+      working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
@@ -43,6 +44,7 @@ runs:
         sudo apt-get install aspell -y
 
         # Check if we can use the current spell checker
+        echo -e " ${{ env.bashInfo }} Check for pre-build spell checker ${{ env.bashEnd }}"
         set +e
         spell-checker
         exitCode=$?
@@ -50,6 +52,7 @@ runs:
         if ! [ $exitCode -eq 0 ]; then
           # If we can't run the current one, install the tools we need to build it
           # This needs the -y flag on the sh. So need to put in a file to run it
+          echo -e " ${{ env.bashInfo }} Don't have the ability to use it, building it ${{ env.bashEnd }}"
           sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install.sh
           chmod 777 install.sh
           ./install.sh -y
@@ -81,18 +84,13 @@ runs:
       working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
-        set +e
-        echo -e "ls = $(ls)\n"
-        echo -e "pwd = $(pwd)\n"
-        echo -e "ls ../ = $(ls ../)\n"
-        set -e
         echo "::group::${{ env.stepName }}"
         echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
         cargo --version
         cargo build --release
-        target/release/spell-checker --help
         mv target/release/spell-checker .
-        echo "$(pwd)/target/release" >> $GITHUB_PATH
+        echo "$(pwd)" >> $GITHUB_PATH
+        spell-checker --help
         exitStatus=$?
           echo "::endgroup::"
           if [ $exitStatus -eq 0 ]; then
