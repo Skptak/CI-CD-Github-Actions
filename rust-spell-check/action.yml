@@ -42,6 +42,7 @@ runs:
         sudo apt-get install util-linux -y
         sudo apt-get install fd-find -y
         sudo apt-get install aspell -y
+        sudo apt-get install spell -y
 
         # Check if we can use the current spell checker
         echo -e " ${{ env.bashInfo }} Check for pre-build spell checker ${{ env.bashEnd }}"
@@ -59,12 +60,13 @@ runs:
 
           # I Split these up into multiple commands so if one errors
           # You can easily see which one causes it
-          sudo apt-get install spell -y
           sudo apt-get install libaspell-dev -y
         fi
         echo "::endgroup::"
+
         # Only get to here if nothing above fails
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+        exitCode=$?
 
     - name: Install rust toolchain
       id: install-rust-toolchain
@@ -112,23 +114,18 @@ runs:
       shell: bash
       run: |
         # ${{ env.stepName }}
-        echo "::group::${{ env.stepName }}"
+        #echo "::group::${{ env.stepName }}"
         set +e
+        echo "steps.spell-checker-setup.outcome=  ${{ steps.spell-checker-setup.outcome }}"
+        export PATH="$PATH:$GITHUB_ACTION_PATH"
         echo "PATH=$PATH"
-        echo "GITHUB_ACTION_PATH= $GITHUB_ACTION_PATH"
-        echo "GITHUB_PATH= $GITHUB_PATH"
-        echo "ls = $(ls)"
-        echo "pwd= $(pwd)"
-        echo "PATH= $PATH"
-        echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-        export PATH="$PATH:$GITHUB_ACTION_PATH/rust-spell-checker"
         set -e
 
         files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}")
         spell-checker -c -w .cSpellWords.txt $files
         exitStatus=$?
 
-        echo "::endgroup::"
+        #echo "::endgroup::"
         if [ $exitStatus -eq 0 ]; then
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
         else
