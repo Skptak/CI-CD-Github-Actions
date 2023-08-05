@@ -32,7 +32,6 @@ runs:
       name: ${{ env.stepName }}
       id: spell-checker-setup
       shell: bash
-      continue-on-error: true
       working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
@@ -51,60 +50,47 @@ runs:
         exitCode=$?
         set -e
         if ! [ $exitCode -eq 0 ]; then
+          echo "::endgroup::"
+          echo -e " ${{ env.bashFail }} Don't have the ability to use the current spell checker, building it ${{ env.bashEnd }}"
+          echo "::group::Compile Spell Checker"
+
+          echo "::group::Install Dependencies"
+
           # If we can't run the current one, install the tools we need to build it
+          # Run one a time for error checking
+          sudo apt-get install libaspell-dev -y
+          sudo apt-get install build-essential -y
+          sudo apt install rustc -y
+
           # This needs the -y flag on the sh. So need to put in a file to run it
-          echo -e " ${{ env.bashInfo }} Don't have the ability to use it, building it ${{ env.bashEnd }}"
           sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install.sh
           chmod 777 install.sh
           ./install.sh -y
+          source $HOME/.cargo/env
 
-          # I Split these up into multiple commands so if one errors
-          # You can easily see which one causes it
-          sudo apt-get install libaspell-dev -y
+          # Check that the things we need installed
+          echo "::endgroup::Install Dependencies"
+          echo -e "${{ env.bashFail }} cargo --version = $(cargo --version) ${{ env.bashEnd }}
+          echo -e "${{ env.bashFail }} rustc --version = $(rustc --version) ${{ env.bashEnd }}
+          echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
+
+          cargo build --release
+          mv target/release/spell-checker .
+          readlink -f spell-checker
+          echo "ls = $(ls)"
+          echo "pwd= $(pwd)"
+          echo "PATH= $PATH"
+          echo "$(pwd)" >> $GITHUB_PATH
+          spell-checker --help
+          exitStatus=$?
+          echo "::endgroup::Compile Spell Checker"
+          # Only make it to here if nothing above fails
+          echo -e "${{ env.bashPass }} Compiled the Spell Checker ${{ env.bashEnd }}"
         fi
         echo "::endgroup::"
-
         # Only get to here if nothing above fails
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-        exitCode=$?
-
-    - name: Install rust toolchain
-      id: install-rust-toolchain
-      if: steps.spell-checker-setup.outcome == 'failure'
-      uses: actions-rs/toolchain@v1
-      with:
-          toolchain: nightly
-          override: true
-          components: rustfmt, clippy
-
-    - env:
-        stepName: Compile Spell checker
-      name: ${{ env.stepName }}
-      id: compile-spell-checker
-      if: steps.spell-checker-setup.outcome == 'failure'
-      shell: bash
-      working-directory: rust-spell-check
-      run: |
-        # ${{ env.stepName }}
-        echo "::group::${{ env.stepName }}"
-        echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
-        cargo --version
-        cargo build --release
-        mv target/release/spell-checker .
-        readlink -f spell-checker
-        echo "ls = $(ls)"
-        echo "pwd= $(pwd)"
-        echo "PATH= $PATH"
-        echo "$(pwd)" >> $GITHUB_PATH
-        spell-checker --help
-        exitStatus=$?
-          echo "::endgroup::"
-          if [ $exitStatus -eq 0 ]; then
-            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-          else
-            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
-            exit 1
-          fi
+        exit $exitCode
 
     - env:
         stepName: Run Spell Checker
