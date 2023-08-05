@@ -35,7 +35,6 @@ runs:
       working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
-        sleep 10;
         echo "::group::${{ env.stepName }}"
 
         # Install the Dependencies we need to run the spell-checker
@@ -47,14 +46,11 @@ runs:
         # Check if we can use the current spell checker
         # This is not added to the path by default.
         # I honestly do not know why
-        echo -e "PATH= $PATH"
-        echo -e "GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH"
-        echo -e "pwd = $(pwd)"
-        export PATH="$GITHUB_ACTION_PATH:$(pwd):$PATH"
+        export PATH="$GITHUB_ACTION_PATH:$PATH"
         echo -e " ${{ env.bashInfo }} Check for pre-build spell checker ${{ env.bashEnd }}"
+        set +e
         spell-checker
         exitCode=$?
-        exitCode=1
         set -e
         if ! [ $exitCode -eq 0 ]; then
           echo "::endgroup::"
@@ -75,11 +71,15 @@ runs:
 
           cargo build --release
           echo -e "find = $(find . -name 'spell-checker') "
-          echo -e "ls target/release = $(ls target/release)"
-          echo -e "ls  = $(ls)"
+          # It's possible that we have one in the directory, but just can't suse it
+          # set +e so we don't error when overriding it
+          set +e
           mv $(find . -name "spell-checker") .
+          set -e
+
           spell-checker --help
           echo "::endgroup::Compile Spell Checker"
+
           # Only make it to here if nothing above fails
           echo -e "${{ env.bashPass }} Compiled the Spell Checker ${{ env.bashEnd }}"
         fi
@@ -97,15 +97,14 @@ runs:
       run: |
         # ${{ env.stepName }}
         #echo "::group::${{ env.stepName }}"
-        set +e
-        echo -e "PATH= $PATH"
-        echo -e "GITHUB_ACTION_PATH=$GITHUB_ACTION_PATH"
-        echo -e "pwd = $(pwd)"
         export PATH="$PATH:$GITHUB_ACTION_PATH"
-        echo "PATH=$PATH"
-        set -e
 
-        files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}")
+        # So here's the deal. At time of writing this spell checker can check
+        # every word in every folder in FreeRTOS/FreeRTOS in like 10 seconds.
+        # So I just let it do that. If this changes in the future, feel free to use
+        # The various exclude dir/file options
+        # files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}")
+        files=$(fdfind -e c -e h)
         spell-checker -c -w .cSpellWords.txt $files
         exitStatus=$?
 
