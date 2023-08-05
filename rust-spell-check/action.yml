@@ -47,6 +47,10 @@ runs:
         # Check if we can use the current spell checker
         echo -e " ${{ env.bashInfo }} Check for pre-build spell checker ${{ env.bashEnd }}"
         set +e
+        echo "ls = $(ls)"
+        echo "PATH = $PATH"
+        echo "pwd = $(pwd)"
+        export PATH="$(pwd):$PATH"
         spell-checker
         exitCode=$?
         set -e
