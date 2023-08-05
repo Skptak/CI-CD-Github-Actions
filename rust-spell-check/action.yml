@@ -32,33 +32,40 @@ runs:
       name: ${{ env.stepName }}
       id: spell-checker-setup
       shell: bash
+      continue-on-error: true
       run: |
         # ${{ env.stepName }}
-        set +e
-        echo -e "ls = $(ls)\n"
-        echo -e "pwd = $(pwd)\n"
-        echo -e "ls ../ = $(ls ../)\n"
-        set -e
         echo "::group::${{ env.stepName }}"
+
+        # Install the Dependencies we need to run the spell-checker
+        sudo apt-get install util-linux -y
+        sudo apt-get install fd-find -y
+        sudo apt-get install aspell -y
+
+        # Check if we can use the current spell checker
+        set +e
+        spell-checker
+        exitCode=$?
+        set -e
+        if ! [ $exitCode -eq 0 ]; then
+          # If we can't run the current one, install the tools we need to build it
           # This needs the -y flag on the sh. So need to put in a file to run it
           sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install.sh
           chmod 777 install.sh
           ./install.sh -y
+
           # I Split these up into multiple commands so if one errors
           # You can easily see which one causes it
           sudo apt-get install spell -y
-          sudo apt-get install util-linux -y
-          sudo apt-get install fd-find -y
-          sudo apt-get install aspell -y
           sudo apt-get install libaspell-dev -y
-          echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-          export PATH="$PATH:$GITHUB_ACTION_PATH"
+        fi
         echo "::endgroup::"
         # Only get to here if nothing above fails
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
     - name: Install rust toolchain
       id: install-rust-toolchain
+      if: steps.spell-checker-setup.outcome == 'failure'
       uses: actions-rs/toolchain@v1
       with:
           toolchain: nightly
@@ -69,6 +76,7 @@ runs:
         stepName: Compile Spell checker
       name: ${{ env.stepName }}
       id: compile-spell-checker
+      if: steps.spell-checker-setup.outcome == 'failure'
       shell: bash
       working-directory: rust-spell-check
       run: |
@@ -102,16 +110,12 @@ runs:
       shell: bash
       run: |
         # ${{ env.stepName }}
-        set +e
-        echo -e "ls = $(ls)\n"
-        echo -e "pwd = $(pwd)\n"
-        echo -e "ls ../ = $(ls ../)\n"
-        set -e
         echo "::group::${{ env.stepName }}"
         echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
         export PATH="$PATH:$GITHUB_ACTION_PATH"
-        getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}"
-        spell-checker -c -w .cSpellWords.txt
+
+        files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}")
+        spell-checker -c -w .cSpellWords.txt $files
         exitStatus=$?
 
         echo "::endgroup::"

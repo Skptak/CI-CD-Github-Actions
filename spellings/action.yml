@@ -23,24 +23,20 @@ runs:
   steps:
     - env:
         stepName: Install Spell
-        bashPass:   \033[32;1mPASSED -
-        bashInfo:   \033[33;1mINFO -
-        bashFail:   \033[31;1mFAILED -
-        bashEnd:    \033[0m
+        bashPass: \033[32;1mPASSED -
+        bashInfo: \033[33;1mINFO -
+        bashFail: \033[31;1mFAILED -
+        bashEnd:  \033[0m
       id: spell-checker-setup
       name: ${{ env.stepName }}
       shell: bash
       run: |
         #  ${{ env.stepName }}
-        set +e
-        echo -e "ls = $(ls)\n"
-        echo -e "pwd = $(pwd)\n"
-        echo -e "ls ../ = $(ls ../)\n"
-        set -e
         echo "::group::${{ env.stepName }}"
         sudo apt-get install spell -y
         sudo apt-get install util-linux -y
         sudo apt-get install fd-find -y
+
         # This is a 1000+ line log for the install
         # Wrap it in an echo group
         echo "::group::NPM Install"
@@ -50,19 +46,19 @@ runs:
 
         echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
         export PATH="$PATH:$GITHUB_ACTION_PATH"
-        echo -e "pwd =$(pwd)"
-        echo -e "ls =$(ls)"
-        echo -e "ls $GITHUB_ACTION_PATH =$(ls $GITHUB_ACTION_PATH)"
-          # cp has an error code if it's asked to copy to the same file
-          # Wrap it in a set +e in case the input path is the working directory
+
+        # cp has an error code if it's asked to copy to the same file
+        # Wrap it in a set +e in case the input path is the working directory
         set +e
         cp $GITHUB_ACTION_PATH/cspell.config.yaml ${{ inputs.path }}
         set -e
-        which getFiles
-        fdfind
-        cspell --version
-        exitStatus=$?
         echo "::endgroup::"
+
+        # Make sure we have all the commands we need.
+        echo -e "${{ env.bashInfo }} which getFiles ${{ env.bashEnd }}"
+        echo -e "${{ env.bashInfo }} fdfind --version ${{ env.bashEnd }}"
+        echo -e "${{ env.bashInfo }} cspell --version ${{ env.bashEnd }}"
+
         # Only get to here if everything above passes
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
@@ -74,14 +70,15 @@ runs:
       shell: bash
       run: |
         #  ${{ env.stepName }}
-        set +e
-        echo -e "ls = $(ls)\n"
-        echo -e "pwd = $(pwd)\n"
-        echo -e "ls ../ = $(ls ../)\n"
-        set -e
         echo "::group::${{ env.stepName }}"
+
+        # Add helper script to path
         export PATH="$PATH:$GITHUB_ACTION_PATH"
+
+        # Get all files
         files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs }}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions}}")
+
+        # Wrap the check in set +e so it runs against all files
         set +e
         exitStatus=0
         for file in ${files[@]}; do
@@ -91,6 +88,7 @@ runs:
           fi
         done
         set -e
+
         echo "::endgroup::"
         if [ $exitStatus -eq 0 ]; then
           echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
