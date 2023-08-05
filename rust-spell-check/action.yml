@@ -48,6 +48,9 @@ runs:
         # I honestly do not know why
         export PATH="$GITHUB_ACTION_PATH:$PATH"
         echo -e " ${{ env.bashInfo }} Check for pre-build spell checker ${{ env.bashEnd }}"
+
+        # Wrap the check to use if in a set +e so we don't error out if it fails
+        # Save the exit code to check later, as "set -e" will overwrite it
         set +e
         spell-checker
         exitCode=$?
@@ -57,14 +60,11 @@ runs:
           echo -e " ${{ env.bashFail }} Don't have the ability to use the current spell checker, building it ${{ env.bashEnd }}"
           echo "::group::Compile Spell Checker"
 
-          echo "::group::Install Build Dependencies"
-
           # If we can't run the current one, install the tools we need to build it
           # Run one a time for error checking
           sudo apt-get install libaspell-dev -y
           sudo apt-get install build-essential -y
           sudo apt install rustc -y
-          echo "::endgroup::Install Build Dependencies"
 
           echo -e "${{ env.bashInfo }} cargo --version = $(cargo --version) ${{ env.bashEnd }}"
           echo -e "${{ env.bashInfo }} rustc --version = $(rustc --version) ${{ env.bashEnd }}"
@@ -86,7 +86,6 @@ runs:
         echo "::endgroup::"
         # Only get to here if nothing above fails
         echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
-        exit $exitCode
 
     - env:
         stepName: Run Spell Checker
