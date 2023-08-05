@@ -89,6 +89,10 @@ runs:
         cargo --version
         cargo build --release
         mv target/release/spell-checker .
+        readlink -f spell-checker
+        echo "ls = $(ls)"
+        echo "pwd= $(pwd)"
+        echo "PATH= $PATH"
         echo "$(pwd)" >> $GITHUB_PATH
         spell-checker --help
         exitStatus=$?
@@ -109,8 +113,16 @@ runs:
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
+        set +e
+        echo "PATH=$PATH"
+        echo "GITHUB_ACTION_PATH= $GITHUB_ACTION_PATH"
+        echo "GITHUB_PATH= $GITHUB_PATH"
+        echo "ls = $(ls)"
+        echo "pwd= $(pwd)"
+        echo "PATH= $PATH"
         echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-        export PATH="$PATH:$GITHUB_ACTION_PATH"
+        export PATH="$PATH:$GITHUB_ACTION_PATH/rust-spell-checker"
+        set -e
 
         files=$(getFiles --exclude-dirs="${{ inputs.exclude-dirs}}" --exclude-files="${{ inputs.exclude-files }}" --include-extensions="${{ inputs.include-extensions }}")
         spell-checker -c -w .cSpellWords.txt $files
