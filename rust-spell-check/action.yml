@@ -35,6 +35,7 @@ runs:
       working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
+        sleep 10;
         echo "::group::${{ env.stepName }}"
 
         # Install the Dependencies we need to run the spell-checker
@@ -54,22 +55,26 @@ runs:
           echo -e " ${{ env.bashFail }} Don't have the ability to use the current spell checker, building it ${{ env.bashEnd }}"
           echo "::group::Compile Spell Checker"
 
-          echo "::group::Install Dependencies"
+          echo "::group::Install Build Dependencies"
 
           # If we can't run the current one, install the tools we need to build it
           # Run one a time for error checking
           sudo apt-get install libaspell-dev -y
           sudo apt-get install build-essential -y
           sudo apt install rustc -y
+          set +e
+          cargo --version
+          rust --version
+          set -e
 
           # This needs the -y flag on the sh. So need to put in a file to run it
           sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install.sh
           chmod 777 install.sh
           ./install.sh -y
-          source $HOME/.cargo/env
+          source $HOME/.cargo/bin
 
           # Check that the things we need installed
-          echo "::endgroup::Install Dependencies"
+          echo "::endgroup::Install Build Dependencies"
           echo -e "${{ env.bashFail }} cargo --version = $(cargo --version) ${{ env.bashEnd }}
           echo -e "${{ env.bashFail }} rustc --version = $(rustc --version) ${{ env.bashEnd }}
           echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
