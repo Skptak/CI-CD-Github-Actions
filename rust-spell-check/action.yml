@@ -32,7 +32,6 @@ runs:
       name: ${{ env.stepName }}
       id: spell-checker-setup
       shell: bash
-      working-directory: rust-spell-check
       run: |
         # ${{ env.stepName }}
         echo "::group::${{ env.stepName }}"
@@ -46,6 +45,13 @@ runs:
         # Check if we can use the current spell checker
         # This is not added to the path by default.
         # I honestly do not know why
+        export PATH="$GITHUB_ACTION_PATH:$PATH"
+        echo -e "PATH= $PATH"
+        echo -e "ls= $(ls)"
+        echo -e "pwd= $(pwd)"
+        echo -e "GITHUB_ACTION_PATH= $GITHUB_ACTION_PATH"
+        echo -e "ls GITHUB_ACTION_PATH= $(ls GITHUB_ACTION_PATH)"
+        echo -e "PATH= $PATH"
         export PATH="$GITHUB_ACTION_PATH:$PATH"
         echo -e " ${{ env.bashInfo }} Check for pre-build spell checker ${{ env.bashEnd }}"
 
@@ -68,7 +74,7 @@ runs:
 
           echo -e "${{ env.bashInfo }} cargo --version = $(cargo --version) ${{ env.bashEnd }}"
           echo -e "${{ env.bashInfo }} rustc --version = $(rustc --version) ${{ env.bashEnd }}"
-
+          pushd "$GITHUB_ACTION_PATH"
           cargo build --release
           echo -e "find = $(find . -name 'spell-checker') "
           # It's possible that we have one in the directory, but just can't suse it
@@ -76,7 +82,7 @@ runs:
           set +e
           mv $(find . -name "spell-checker") .
           set -e
-
+          popd
           spell-checker --help
           echo "::endgroup::Compile Spell Checker"
 
